@@ -29,7 +29,7 @@ displayName="Fairy Factions" #mandatory
 # A file name (in the root of the mod JAR) containing a logo for display
 logoFile="fairyfactions.png" #optional
 # A text field displayed in the mod UI
-credits="KodaichiZero - original mod, Allaryin - 1.7.10 version, pau101 - 1.6.4 version" #optional
+credits="KodaichiZero - original mod, 1.7.10 version - Allaryin, pau101" #optional
 # A text field displayed in the mod UI
 authors="HeyImAmethyst" #optional
 # The description text for the mod (multi line!) (#mandatory)
