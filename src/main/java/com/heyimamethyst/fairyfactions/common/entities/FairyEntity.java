@@ -741,8 +741,6 @@ public class FairyEntity extends FairyEntityBase
     public void aiStep()
     {
         super.aiStep();
-        //swingArm(InteractionHand.MAIN_HAND);
-        //updateSwingTime();
         setHeldItem();
         //setItemInHand(InteractionHand.MAIN_HAND, getItemInHand(InteractionHand.MAIN_HAND));
     }
@@ -974,56 +972,55 @@ public class FairyEntity extends FairyEntityBase
 
     // region Item Hold Logic
 
-    @Override
-    public ItemStack getItemInHand(InteractionHand hand)
-    {
-        if (tempItem != null)
-        {
-            return tempItem;
-        }
-
-        if (queen()) // Queens always carry the gold/iron sword, guards
-                          // always have the wooden sword.
-        {
-            if (getSkin() % 2 == 1)
-            {
-                return ironSword;
-            }
-
-            return goldSword;
-        }
-
-        if (guard())
-        {
-            return woodSword;
-        }
-
-        if (medic() && canHeal() && !angry()) // Medics carry potions
-        {
-            return handPotion();
-        }
-
-        if (scout()) // Scouts have maps now.
-        {
-            return scoutMap;
-        }
-
-        //return super.getItemInHand(hand);
-        return ItemStack.EMPTY;
-    }
+//    @Override
+//    public ItemStack getItemInHand(InteractionHand hand)
+//    {
+//        if (tempItem != null)
+//        {
+//            return tempItem;
+//        }
+//
+//        if (queen()) // Queens always carry the gold/iron sword, guards
+//                          // always have the wooden sword.
+//        {
+//            if (getSkin() % 2 == 1)
+//            {
+//                return ironSword;
+//            }
+//
+//            return goldSword;
+//        }
+//
+//        if (guard())
+//        {
+//            return woodSword;
+//        }
+//
+//        if (medic() && canHeal() && !angry()) // Medics carry potions
+//        {
+//            return handPotion();
+//        }
+//
+//        if (scout()) // Scouts have maps now.
+//        {
+//            return scoutMap;
+//        }
+//
+//        //return super.getItemInHand(hand);
+//        return ItemStack.EMPTY;
+//    }
 
     public void setHeldItem()
     {
-        if (tempItem != null && !angry())
+        if (tempItem != null)
         {
             this.setItemSlot(EquipmentSlot.MAINHAND, tempItem);
         }
         else if(getTempItem() == Items.STICK)
         {
-            this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(getTempItem()));
+            this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.STICK));
         }
-
-        if (queen()) // Queens always carry the gold/iron sword, guards
+        else if (queen()) // Queens always carry the gold/iron sword, guards
         // always have the wooden sword.
         {
             if (getSkin() % 2 == 1)
@@ -1036,23 +1033,20 @@ public class FairyEntity extends FairyEntityBase
                 this.setItemSlot(EquipmentSlot.MAINHAND, goldSword);
             }
         }
-
-        if (guard())
+        else if (guard())
         {
             this.setItemSlot(EquipmentSlot.MAINHAND, woodSword);
         }
-
-        if (medic() && canHeal() && !angry()) // Medics carry potions
+        else if (medic() && canHeal() && !angry()) // Medics carry potions
         {
             this.setItemSlot(EquipmentSlot.MAINHAND, handPotion());
         }
-
-        if (scout()) // Scouts have maps now.
+        else if (scout()) // Scouts have maps now.
         {
             this.setItemSlot(EquipmentSlot.MAINHAND, scoutMap);
         }
 
-        this.setItemSlot(EquipmentSlot.MAINHAND, getItemInHand(InteractionHand.MAIN_HAND));
+        this.setItemSlot(EquipmentSlot.MAINHAND, super.getItemInHand(InteractionHand.MAIN_HAND));
     }
 
     //endregion
@@ -1408,51 +1402,6 @@ public class FairyEntity extends FairyEntityBase
 //
 //    }
 
-    public void swingArm(InteractionHand interactionHand)
-    {
-
-        if (getArmSwing() != this.didSwing)
-        {
-            this.didSwing = !this.didSwing;
-
-            isSwinging = true;
-            this.tempItem = null;
-            this.swing(interactionHand);
-        }
-    }
-
-//    @Override
-//    protected void updateSwingTime()
-//    {
-//        int i = this.getCurrentSwingDuration();
-//
-//        if (isSwinging)
-//        {
-//            this.swingTime++;
-//
-//            if (this.swingTime >= i)
-//            {
-//                this.swingTime = 0;
-//                isSwinging = false;
-//
-//                if (this.tempItem != null && this.tempItem != fishingStick)
-//                {
-//                    this.tempItem = null;
-//                }
-//            }
-//            else if (this.tempItem == null && getTempItem() != null)
-//            {
-//                this.tempItem = new ItemStack(getTempItem(), 1);
-//            }
-//        }
-//
-//        this.attackAnim = (float)this.swingTime / i;
-//
-//        if (!isSitting() && this.tempItem != null && this.tempItem == fishingStick)
-//        {
-//            this.tempItem = null;
-//        }
-//    }
 
     private void processSwinging()
     {
