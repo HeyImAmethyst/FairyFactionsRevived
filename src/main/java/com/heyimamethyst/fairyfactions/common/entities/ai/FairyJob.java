@@ -48,10 +48,6 @@ import java.util.Random;
 
 public class FairyJob
 {
-    // Obfuscated name lookups
-    private static final String[] MCP_FLEEINGTICK = { "fleeingTick", "field_70788_c" };
-    private static final String[] MCP_BREEDING = { "breeding", "field_70882_e" };
-    private static final String[] MCP_INLOVE = { "inLove", "field_70881_d" };
 
     // Recursion limit for trees.
     private static final int	maxTreeHeight	= 99;
@@ -194,10 +190,9 @@ public class FairyJob
             final Animal entity1 = (Animal) list.get( i );
 
             // TODO: track combat correctly
-            //final int fleeingTick = ReflectionHelper.getPrivateValue(EntityCreature.class, entity1, MCP_FLEEINGTICK);
 
             if ( FairyUtils.peacefulAnimal( entity1 ) && fairy.hasLineOfSight( entity1 ) && entity1.getHealth() > 0
-                    && entity1.getTarget() == null /*&& fleeingTick <= 0*/ && !entity1.isInLove()
+                    && entity1.getTarget() == null && !entity1.isInLove()
                     && entity1.getAge() == 0 )
             {
                 for ( int j = 0; j < list.size(); j++ )
@@ -239,10 +234,9 @@ public class FairyJob
             final Sheep entity1 = (Sheep) list.get( i );
 
             // TODO: track combat correctly
-            //final int fleeingTick = ReflectionHelper.getPrivateValue(EntityCreature.class, entity1, MCP_FLEEINGTICK);
 
             if ( fairy.hasLineOfSight( entity1 ) && entity1.getHealth() > 0 && entity1.getTarget() == null
-                    /* && fleeingTick <= 0 */ && entity1.getAge() >= 0 && !entity1.isSheared() )
+                    && entity1.getAge() >= 0 && !entity1.isSheared() )
             {
                 list2.add( entity1 );
             }
@@ -391,7 +385,6 @@ public class FairyJob
                 return true;
             }
 
-            // TODO, I think the seed planting code should take care of this now?
             if ( isSaplingBlock(stack) && onSaplingUse( stack, x, y, z, world ) )
             {
                 return true;
@@ -537,9 +530,6 @@ public class FairyJob
     private boolean onSeedUse( final ItemStack stack, int x, final int y, int z, final Level world )
     {
 
-        /**
-         * This can be a bit messy, so will actually defer cleanup until after release.
-         */
         IPlantable plantable;
 
         if (Block.byItem(stack.getItem()) instanceof IPlantable)
@@ -733,7 +723,7 @@ public class FairyJob
     // What to do with saplings
     private boolean onSaplingUse( final ItemStack stack, int x, final int y, int z, final Level world )
     {
-        // TODO: use a sapling correctly :)
+        // TODO: experiment more with sapling placing code. Fairies place saplings less frequently than intended
         //return true;
 
         IPlantable plantable;
@@ -836,7 +826,6 @@ public class FairyJob
         {
             final Animal entity = (Animal) animals.get( i );
 
-            //int isBreedingCounter = ReflectionHelper.getPrivateValue(Animal.class, entity, MCP_BREEDING);
             int isBreedingCounter = entity.getInLoveTime();
 
             // skip unbreedable animals
@@ -852,7 +841,6 @@ public class FairyJob
 
             if ( fairy.distanceTo( entity ) < 3F )
             {
-                //ReflectionHelper.setPrivateValue(Animal.class, entity, 600, MCP_INLOVE);
                 //FairyFactions.LOGGER.debug(this.fairy.toString()+": breeding animals");
 
                 entity.setInLoveTime(600);
@@ -976,8 +964,7 @@ public class FairyJob
 
                 if ( !flag )
                 {
-                    // final PathEntity doug = world.getEntityPathToXYZ( fairy, a, b + j, c, 16F, false, false, true, true );
-                    final Path path = fairy.getNavigation().createPath(new BlockPos(a, b+j, c), 1);
+                    final Path path = fairy.getNavigation().createPath(new BlockPos(a, b + j, c), 1);
 
                     if (path != null && canSeeToSpot( posX, posY, posZ, world ))
                     {
@@ -985,7 +972,10 @@ public class FairyJob
                         fairy.getLookControl().setLookAt(posX,posY,posZ, angle, fairy.getMaxHeadXRot());
                         fairy.castRod();
                         fairy.playSound(SoundEvents.FISHING_BOBBER_THROW, 1, 1);
+
                         // TODO: player fishing normally damages the rod when the reels something in; should we do that?
+                        //Currently can't figure out how to achieve that. Need to pass the itemstack to the fairy tasks class for the other
+                        //"castRod" method call for reeling the fish in
 
                         stack.hurtAndBreak(1, fairy, (p_29822_) ->
                         {
@@ -1040,7 +1030,6 @@ public class FairyJob
                 if ( FairyUtils.isAirySpace( fairy, i, j, k ) && !FairyUtils.isAirySpace(fairy, i, j - 1, k )
                         && world.getBlockState( new BlockPos(i, j - 1, k) ).isSolidRender(fairy.level, new BlockPos(i, j - 1, k)))
                 {
-                    // final PathEntity doug = world.getEntityPathToXYZ( fairy, i, j, k, 16F, false, false, true, true );
                     final Path path = fairy.getNavigation().createPath(new BlockPos(i, j, k), 1);
 
                     if ( path != null )
@@ -1121,10 +1110,15 @@ public class FairyJob
         BlockPos pos = new BlockPos(x,y,z);
         BlockState state = world.getBlockState(pos);
 
-        BlockPos north = pos.north();
-        BlockPos south = pos.south();
-        BlockPos east = pos.east();
-        BlockPos west = pos.west();
+//        BlockPos north = pos.north();
+//        BlockPos south = pos.south();
+//        BlockPos east = pos.east();
+//        BlockPos west = pos.west();
+
+        BlockPos north = new BlockPos(pos.getX(), pos.getY(), pos.getZ() - 1);
+        BlockPos south = new BlockPos(pos.getX(), pos.getY(), pos.getZ() + 1);
+        BlockPos east = new BlockPos(pos.getX() + 1, pos.getY(), pos.getZ());
+        BlockPos west = new BlockPos(pos.getX() - 1, pos.getY(), pos.getZ());
 
         BlockState northState = world.getBlockState(north);
         BlockState southState = world.getBlockState(south);
@@ -1145,10 +1139,15 @@ public class FairyJob
         BlockPos posBelow = new BlockPos(x, y - 1, z);
         BlockState stateBelow = world.getBlockState(posBelow);
 
-        BlockPos northAbove = posAbove.north();
-        BlockPos southAbove = posAbove.south();
-        BlockPos eastAbove = posAbove.east();
-        BlockPos westAbove = posAbove.west();
+//        BlockPos northAbove = posAbove.north();
+//        BlockPos southAbove = posAbove.south();
+//        BlockPos eastAbove = posAbove.east();
+//        BlockPos westAbove = posAbove.west();
+
+        BlockPos northAbove = new BlockPos(posAbove.getX(), posAbove.getY(), posAbove.getZ() - 1);
+        BlockPos southAbove = new BlockPos(posAbove.getX(), posAbove.getY(), posAbove.getZ() + 1);
+        BlockPos eastAbove = new BlockPos(posAbove.getX() + 1, posAbove.getY(), posAbove.getZ());
+        BlockPos westAbove = new BlockPos(posAbove.getX() - 1, posAbove.getY(), posAbove.getZ());
 
         BlockState northStateAbove = world.getBlockState(northAbove);
         BlockState southStateAbove = world.getBlockState(southAbove);
@@ -1173,10 +1172,6 @@ public class FairyJob
         //return canPlaceSapling(x, y + 1, z, j, world) ? 1 : 0;
     }
 
-    // Trim tall grass to look for seeds.
-    /* TODO: I think we can do somewhat better than this, something like Block::harvestBlock for mobs?
-     * check inventory for best tool?  can earn harvest?  Can mine ores?
-     */
     private boolean cutTallGrass( int x, final int y, int z, final Level world )
     {
         final int m = x;
@@ -1369,34 +1364,6 @@ public class FairyJob
     }
 
     // Is it a plant that should be broken
-//    private boolean breakablePlant(final BlockState state, final Block above, final Block below )
-//    {
-//        // we're gonna treat this as everything block that should be punched.
-//        // cocoa?... hrmmm
-//        // mushrooms: tricky, when there are at least 4 other mushrooms of same type in 9x3x9 area.
-//        // snow?  maybe?  if there's plants?  if there's no shovel?
-//
-//        // crops: that should be wheat, carrots and potatoes, when MD level is 7.
-//        final Block block = state.getBlock();
-//        return (block instanceof CropBlock && !(block instanceof BeetrootBlock) && !(block instanceof NetherWartBlock) && (state.hasProperty(((CropBlock)block).getAgeProperty()) && ((CropBlock)block).isMaxAge(state)))
-//                // not a crop, a bush apparently...
-//                || block == Blocks.BEETROOTS && state.getValue(BeetrootBlock.AGE) == 3
-//                || block == Blocks.NETHER_WART && state.getValue(NetherWartBlock.AGE) == 3
-//                // reeds: when above reeds.
-//                || block == Blocks.SUGAR_CANE && above == Blocks.SUGAR_CANE && below != Blocks.SUGAR_CANE
-//                // cactus: break only when above sand and below cactus, to prevent losing drops.
-//                || block == Blocks.CACTUS && above == Blocks.CACTUS && below != Blocks.CACTUS
-//                // melons/pumkins... always?
-//                || block == Blocks.MELON || block == Blocks.PUMPKIN
-//                // tallgrass, which drops seeds!
-//                || block == Blocks.TALL_GRASS
-//                || block == Blocks.GRASS
-//                // all other doo-dads? ie bushes and tall plants?
-//                || block == Blocks.DANDELION
-//                || block == Blocks.POPPY
-//                || block == Blocks.SNOW;
-//    }
-
     private boolean breakablePlant(final BlockState state, final Block above, final Block below )
     {
         // we're gonna treat this as everything block that should be punched.
@@ -1427,29 +1394,11 @@ public class FairyJob
                 || block == Blocks.SNOW;
     }
 
-    // TODO: read allowed seeds from config file.
     private boolean isSeedItem( final Item item )
     {
         return Block.byItem(item) instanceof IPlantable
                 || item == Items.SUGAR_CANE;
     }
-
-//    private boolean isCropBaseSeedId(final Item item)
-//    {
-//        if(Block.byItem(item) instanceof CropBlock)
-//        {
-//            CropBlock cropBlock = (CropBlock) Block.byItem(item);
-//
-////            if(cropBlock.getCloneItemStack(null, null, null) != null)
-////            {
-////                return true;
-////            }
-//
-//            cropBlock.
-//        }
-//
-//        return false;
-//    }
 
     private boolean isBonemealItem( final Item item)
     {
