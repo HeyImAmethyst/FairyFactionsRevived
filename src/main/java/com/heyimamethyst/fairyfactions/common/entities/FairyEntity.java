@@ -1045,8 +1045,11 @@ public class FairyEntity extends FairyEntityBase
         {
             this.setItemSlot(EquipmentSlot.MAINHAND, scoutMap);
         }
-
-        this.setItemSlot(EquipmentSlot.MAINHAND, super.getItemInHand(InteractionHand.MAIN_HAND));
+        else
+        {
+            this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
+        }
+        //this.setItemSlot(EquipmentSlot.MAINHAND, super.getItemInHand(InteractionHand.MAIN_HAND));
     }
 
     //endregion
