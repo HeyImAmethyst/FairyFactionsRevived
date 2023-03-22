@@ -258,6 +258,8 @@ public class FairyModel <T extends LivingEntity> extends HumanoidModel<T>
         rightArm.yRot = 0.0F;
         leftArm.yRot = 0.0F;
 
+        //Swing animation
+
         if(attackTime > -9990F)
         {
             float f6 = attackTime;
