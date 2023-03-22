@@ -1439,6 +1439,20 @@ public class FairyJob
         return item.is(ItemTags.FISHES);
     }
 
+    private boolean isAnimalProduct(Item i)
+    {
+        return (i == Items.CHICKEN)
+                || (i == Items.BEEF)
+                || (i == Items.MUTTON)
+                || (i == Items.PORKCHOP)
+                || (i == Items.COOKED_CHICKEN)
+                || (i == Items.COOKED_BEEF)
+                || (i == Items.COOKED_MUTTON)
+                || (i == Items.COOKED_PORKCHOP)
+                || (i == Items.LEATHER)
+                || (i == Items.ROTTEN_FLESH);
+    }
+
     private boolean isFishLoot( final ItemStack item )
     {
         //return item.is(ItemTags.FISHES);
@@ -1468,7 +1482,10 @@ public class FairyJob
         {
             for (ItemStack itemstack : list)
             {
-                return item.is(itemstack.getItem());
+                if(item.getItem() == itemstack.getItem())
+                {
+                    return true;
+                }
             }
         }
 
@@ -1495,6 +1512,6 @@ public class FairyJob
         return isHoeItem( stack.getItem() ) || isSeedItem( stack.getItem() ) || isBonemealItem( stack.getItem()) || isAxeItem( stack.getItem() )
                 || isSaplingBlock( stack ) || isLogBlock( stack ) || FairyUtils.acceptableFoods(fairy, stack.getItem() )
                 ||  isBreedingItem( stack.getItem() ) ||  isShearingItem( stack.getItem() ) || isClothBlock( stack ) || isFishingItem( stack.getItem() )
-                || isRawFish( stack ) || isFishLoot(stack) || isFlower( stack.getItem()) || stack.is(Items.STICK) || stack.is(Blocks.PUMPKIN.asItem());
+                || isAnimalProduct(stack.getItem()) || isRawFish( stack ) || isFishLoot(stack) || isFlower( stack.getItem()) || stack.is(Items.STICK) || stack.is(Blocks.PUMPKIN.asItem());
     }
 }
