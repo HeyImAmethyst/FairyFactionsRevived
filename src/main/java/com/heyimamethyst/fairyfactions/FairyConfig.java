@@ -102,7 +102,7 @@ public class FairyConfig
 
         DEF_FLOAT_RATE = BUILDER.comment("fall speed").define("DEF_FLOAT_RATE", -0.2D);
         DEF_FLAP_RATE = BUILDER.comment("fly speed").define("DEF_FLAP_RATE", 0.15D);
-        DEF_SOLO_FLAP_MULT = BUILDER.comment("bonus to flight while unburdened").define("DEF_SOLO_FLAP_MULT", 1.25D);
+        DEF_SOLO_FLAP_MULT = BUILDER.comment("bonus to flight while unburdened").define("DEF_SOLO_FLAP_MULT", -0.9375D);
         DEF_LIFTOFF_MULT = BUILDER.comment("bonus to flight when launching").define("DEF_LIFTOFF_MULT", 2.0D);
 
         DEF_MAX_PARTICLES = BUILDER.define("DEF_MAX_PARTICLES", 5);
