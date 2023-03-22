@@ -5,8 +5,6 @@ import com.heyimamethyst.fairyfactions.common.entities.FairyEntity;
 import net.minecraft.world.entity.FlyingMob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
 import org.jetbrains.annotations.NotNull;
 
 public class FairyAttackGoal extends MeleeAttackGoal
@@ -21,7 +19,12 @@ public class FairyAttackGoal extends MeleeAttackGoal
 
     public boolean canUse()
     {
-        return !theFairy.isSitting() && theFairy.angry() && !theFairy.crying() && super.canUse();
+        return super.canUse() && !theFairy.isSitting() && theFairy.angry() && !theFairy.crying();
+    }
+
+    public boolean canContinueToUse()
+    {
+        return super.canContinueToUse() && !theFairy.isSitting() && theFairy.angry() && !theFairy.crying();
     }
 
     @Override
