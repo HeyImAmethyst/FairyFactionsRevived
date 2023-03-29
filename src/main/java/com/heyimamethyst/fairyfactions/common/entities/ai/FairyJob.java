@@ -2,6 +2,7 @@ package com.heyimamethyst.fairyfactions.common.entities.ai;
 
 import com.google.common.collect.Maps;
 import com.heyimamethyst.fairyfactions.FairyFactions;
+import com.heyimamethyst.fairyfactions.core.registry.ModItemTags;
 import com.heyimamethyst.fairyfactions.util.FairyUtils;
 import com.heyimamethyst.fairyfactions.common.entities.FairyEntity;
 import net.minecraft.Util;
@@ -272,11 +273,11 @@ public class FairyJob
 
                     if ( world.getBlockState(pos).getBlock() == Blocks.CHEST )
                     {
-                        final BlockEntity tent = world.getBlockEntity(pos);
+                        final BlockEntity blockEntity = world.getBlockEntity(pos);
 
-                        if ( tent != null && tent instanceof ChestBlockEntity)
+                        if ( blockEntity != null && blockEntity instanceof ChestBlockEntity)
                         {
-                            final ChestBlockEntity chest = (ChestBlockEntity) tent;
+                            ChestBlockEntity chest = (ChestBlockEntity) blockEntity;
 
                             if ( goodies != null && collectGoodies( chest, world ) )
                             {
@@ -396,8 +397,8 @@ public class FairyJob
                 return true;
             }
 
-            // Breeding
-            if (!triedShearing && isShearingItem(stack.getItem()) && onShearingUse(stack, world))
+            // Sheep shearing
+            if (!triedShearing && isShearingItem(stack.getItem()) && (onShearingUse(stack, world) || gatherHoneyComb(stack, x, y, z, world)))
             {
                 return true;
             }
@@ -530,7 +531,7 @@ public class FairyJob
     private boolean onSeedUse( final ItemStack stack, int x, final int y, int z, final Level world )
     {
 
-        IPlantable plantable;
+        IPlantable plantable = null;
 
         if (Block.byItem(stack.getItem()) instanceof IPlantable)
         {
@@ -540,17 +541,26 @@ public class FairyJob
         {
             plantable = (SugarCaneBlock) Blocks.SUGAR_CANE;
         }
-        else
-        {
-            throw new NullPointerException("stack doesn't look plantable to me.");
-        }
+//        else
+//        {
+//            throw new NullPointerException("stack doesn't look plantable to me.");
+//        }
 
-        final BlockState state = plantable.getPlant(world, new BlockPos(x,y,z));
+        BlockState state = null;
+
+        if(plantable != null)
+        {
+            state = plantable.getPlant(world, new BlockPos(x,y,z));
+        }
+        else if (Block.byItem(stack.getItem()) instanceof CocoaBlock)
+        {
+            state = Block.byItem(stack.getItem()).defaultBlockState();
+        }
 
         for ( int a = 0; a < 3; a++ )
         {
             //canPlaceBlockAt
-            if (!state.is(BlockTags.FLOWERS) && !state.is(BlockTags.SAPLINGS) && world.getBlockState(new BlockPos(x,y,z)).getMaterial().isReplaceable() && state.canSurvive(world, new BlockPos(x,y,z)))//state.getMaterial().isReplaceable()) // world.getBlockState(new BlockPos(x,y,z).above()).is(Blocks.AIR) && state.canSurvive(world, new BlockPos(x,y,z)))
+            if (state != null && /*!state.is(BlockTags.FLOWERS) && */!state.is(BlockTags.SAPLINGS) && world.getBlockState(new BlockPos(x,y,z)).getMaterial().isReplaceable() && state.canSurvive(world, new BlockPos(x,y,z)))//state.getMaterial().isReplaceable()) // world.getBlockState(new BlockPos(x,y,z).above()).is(Blocks.AIR) && state.canSurvive(world, new BlockPos(x,y,z)))
             {
 
                 //FairyFactions.LOGGER.debug(this.fairy.toString()+": planting seed");
@@ -614,6 +624,72 @@ public class FairyJob
         }
 
         return false;
+    }
+
+    private boolean gatherHoneyComb(final ItemStack stack, int x, final int y, int z, final Level world )
+    {
+        final int m = x;
+        final int n = z;
+
+        for ( int a = 0; a < 9; a++ )
+        {
+            x = m + ((a / 3) % 9) - 1;
+            z = n + (a % 3) - 1;
+
+            if( shearBeeHive( world, x, y, z) )
+            {
+                fairy.armSwing( !fairy.didSwing );
+                fairy.setTempItem(stack.getItem());
+
+                stack.hurtAndBreak(1, fairy, (p_29822_) ->
+                {
+                    p_29822_.broadcastBreakEvent(InteractionHand.MAIN_HAND);
+                });
+
+                fairy.attackAnim = 30;
+
+                if ( !fairy.flymode() && fairy.getFlyTime() > 0 )
+                {
+                    fairy.setFlyTime( 0 );
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean shearBeeHive( final Level world, final int x, final int y, final int z )
+    {
+        final BlockPos pos = new BlockPos(x,y,z);
+        final BlockState state = world.getBlockState(pos);
+        final Block block = state.getBlock();
+
+        triedShearing = true;
+
+        if (state.is(BlockTags.BEEHIVES))
+        {
+            //FairyFactions.LOGGER.debug(this.fairy.toString()+": chopping wood");
+            //world.destroyBlock(new BlockPos(x, y, z), true, fairy);
+            BeehiveBlock beehiveBlock = (BeehiveBlock) block;
+
+            if(CampfireBlock.isSmokeyPos(world, pos) && state.getValue(beehiveBlock.HONEY_LEVEL) >= 5)
+            {
+                beehiveBlock.dropHoneycomb(world, pos);
+                beehiveBlock.resetHoneyLevel(world, state, pos);
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
 
     // What to do with an axe
@@ -1385,19 +1461,21 @@ public class FairyJob
                 || block == Blocks.CACTUS && above == Blocks.CACTUS && below != Blocks.CACTUS
                 // melons/pumkins... always?
                 || block == Blocks.MELON || block == Blocks.PUMPKIN
+                || block == Blocks.COCOA && state.getValue(CocoaBlock.AGE) == 2
                 // tallgrass, which drops seeds!
                 || block == Blocks.TALL_GRASS
                 || block == Blocks.GRASS
                 // all other doo-dads? ie bushes and tall plants?
-                || block == Blocks.DANDELION
-                || block == Blocks.POPPY
+                //|| block == Blocks.DANDELION
+                //|| block == Blocks.POPPY
                 || block == Blocks.SNOW;
     }
 
     private boolean isSeedItem( final Item item )
     {
         return Block.byItem(item) instanceof IPlantable
-                || item == Items.SUGAR_CANE;
+                || item == Items.SUGAR_CANE
+                || Block.byItem(item) instanceof CocoaBlock;
     }
 
     private boolean isBonemealItem( final Item item)
@@ -1450,52 +1528,20 @@ public class FairyJob
                 || (i == Items.COOKED_MUTTON)
                 || (i == Items.COOKED_PORKCHOP)
                 || (i == Items.LEATHER)
-                || (i == Items.ROTTEN_FLESH);
+                || (i == Items.EGG)
+                || (i == Items.HONEYCOMB);
     }
 
     private boolean isFishLoot( final ItemStack item )
     {
-        //return item.is(ItemTags.FISHES);
-
-//        double luck = 0.1D;
-//        LootContext.Builder builder = (new LootContext.Builder((ServerLevel)fairy.level))
-//                .withParameter(LootContextParams.ORIGIN, fairy.position())
-//                .withParameter(LootContextParams.TOOL, fairy.getItemInHand(InteractionHand.MAIN_HAND))
-//                .withLuck((float) luck);
-//
-//        LootTable loottable = fairy.getServer().getLootTables().get(BuiltInLootTables.FISHING);
-
-        LootContext.Builder builder = (new LootContext.Builder((ServerLevel) fairy.level))
-                .withParameter(LootContextParams.ORIGIN, fairy.position())
-                .withParameter(LootContextParams.TOOL, fairy.getItemInHand(InteractionHand.MAIN_HAND))
-                .withParameter(LootContextParams.THIS_ENTITY, fairy).withRandom(fairy.level.getRandom())
-                .withLuck((float)fairy.fishingLuckBonus + fairy.getLuck());
-
-        builder.withParameter(LootContextParams.KILLER_ENTITY, fairy)
-                .withParameter(LootContextParams.THIS_ENTITY, fairy);
-
-        LootTable loottable = fairy.level.getServer().getLootTables().get(BuiltInLootTables.FISHING);
-
-        List<ItemStack> list = loottable.getRandomItems(builder.create(LootContextParamSets.FISHING));
-
-        if(list != null)
-        {
-            for (ItemStack itemstack : list)
-            {
-                if(item.getItem() == itemstack.getItem())
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return item.is(ModItemTags.IS_FISH_LOOT);
     }
 
     private boolean isFlower( final Item item )
     {
         // NB: Let's just hope that iplantables are sufficient for this for now
-        return item instanceof IPlantable;
+        //return item instanceof IPlantable;
+        return  Block.byItem(item).defaultBlockState().is(BlockTags.FLOWERS);
     }
 
     private boolean isBreedingItem(Item i)
