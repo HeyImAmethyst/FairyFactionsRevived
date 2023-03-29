@@ -1,7 +1,6 @@
 package com.heyimamethyst.fairyfactions.common.entities.ai;
 
 import com.google.common.collect.Maps;
-import com.heyimamethyst.fairyfactions.FairyFactions;
 import com.heyimamethyst.fairyfactions.core.registry.ModItemTags;
 import com.heyimamethyst.fairyfactions.util.FairyUtils;
 import com.heyimamethyst.fairyfactions.common.entities.FairyEntity;
@@ -9,14 +8,10 @@ import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.animal.Animal;
@@ -31,13 +26,7 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.pathfinder.Path;
-import net.minecraft.world.level.storage.loot.BuiltInLootTables;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.IPlantable;
@@ -45,7 +34,6 @@ import net.minecraftforge.common.IPlantable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 public class FairyJob
 {
@@ -398,7 +386,7 @@ public class FairyJob
             }
 
             // Sheep shearing
-            if (!triedShearing && isShearingItem(stack.getItem()) && (onShearingUse(stack, world) || gatherHoneyComb(stack, x, y, z, world)))
+            if (!triedShearing && isShearingItem(stack.getItem()) && (shearSheep(stack, world) || harvestHoneyComb(stack, x, y, z, world)))
             {
                 return true;
             }
@@ -626,7 +614,7 @@ public class FairyJob
         return false;
     }
 
-    private boolean gatherHoneyComb(final ItemStack stack, int x, final int y, int z, final Level world )
+    private boolean harvestHoneyComb(final ItemStack stack, int x, final int y, int z, final Level world )
     {
         final int m = x;
         final int n = z;
@@ -944,7 +932,7 @@ public class FairyJob
         return false;
     }
 
-    private boolean onShearingUse( final ItemStack stack, final Level world )
+    private boolean shearSheep(final ItemStack stack, final Level world )
     {
         final ArrayList<Sheep> sheep = getSheep( world );
         triedShearing = true;
@@ -1110,7 +1098,7 @@ public class FairyJob
 
                     if ( path != null )
                     {
-                        fairy.getNavigation().moveTo(path, 0.3D);
+                        fairy.getNavigation().moveTo(path, fairy.speedModifier);
 
                         if ( !fairy.flymode() )
                         {
@@ -1327,7 +1315,7 @@ public class FairyJob
     {
         int count = 0;
 
-        fairy.getNavigation().moveTo(goodies.get(0), 0.3D);
+        fairy.getNavigation().moveTo(goodies.get(0), fairy.speedModifier);
 
         for ( int i = 0; i < goodies.size() && count < 3; i++ )
         {

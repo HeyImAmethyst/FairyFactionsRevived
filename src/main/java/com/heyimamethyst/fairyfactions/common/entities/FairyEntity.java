@@ -98,6 +98,8 @@ public class FairyEntity extends FairyEntityBase
     double vehicleMotionY = 0;
     double vehicleMotionZ = 0;
 
+    public double speedModifier = 0.3D;
+
     private LivingEntity	    ruler;
     public LivingEntity	        entityHeal;
     private Entity				entityFear;
@@ -146,14 +148,14 @@ public class FairyEntity extends FairyEntityBase
         this.cower = this.getRandom().nextBoolean();
         this.postX = this.postY = this.postZ = -1;
 
-        fairyTasks = new FairyTasks(this, 0.3D);
+        fairyTasks = new FairyTasks(this, speedModifier);
         switchNavigator(flymode());
     }
 
     @Override
     protected void registerGoals()
     {
-        this.fairyAttackGoal = new FairyAttackGoal(this, 0.3D, false);
+        this.fairyAttackGoal = new FairyAttackGoal(this, speedModifier, false);
 
         this.goalSelector.addGoal(1, new FloatGoal(this));
 
@@ -161,8 +163,8 @@ public class FairyEntity extends FairyEntityBase
 
         this.goalSelector.addGoal(4, new FairyAI((this)));
 
-        //this.goalSelector.addGoal(10, new FairyAIStroll(this, 0.3D, 1.0000001E-5F));
-        this.goalSelector.addGoal(4, new FairyAIStroll(this, 0.3D));
+        //this.goalSelector.addGoal(10, new FairyAIStroll(this, speedModifier, 1.0000001E-5F));
+        this.goalSelector.addGoal(4, new FairyAIStroll(this, speedModifier));
         this.goalSelector.addGoal(12, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(11, new LookAtPlayerGoal(this, Player.class, 10.0F));
     }
@@ -390,7 +392,7 @@ public class FairyEntity extends FairyEntityBase
     @Override
     protected double followLeashSpeed()
     {
-        return 0.3D;
+        return speedModifier;
     }
 
 //    @Override
@@ -1054,7 +1056,7 @@ public class FairyEntity extends FairyEntityBase
         level.addFreshEntity(potion);
 
         //this.getNavigation().stop();
-        this.getNavigation().moveTo((Path) null, 0.3D);
+        this.getNavigation().moveTo((Path) null, speedModifier);
 
         this.healTime = 200;
         setRarePotion(getRandom().nextInt(4) == 0);
@@ -1092,7 +1094,7 @@ public class FairyEntity extends FairyEntityBase
             setSitting(true);
             this.jumping = false;
             //this.getNavigation().stop();
-            this.getNavigation().moveTo((Path) null, 0.3D);
+            this.getNavigation().moveTo((Path) null, speedModifier);
             setTarget(null);
             this.entityFear = null;
         }
@@ -1712,7 +1714,7 @@ public class FairyEntity extends FairyEntityBase
 
                     this.jumping = false;
                     //this.navigation.stop();
-                    this.getNavigation().moveTo((Path) null, 0.3D);
+                    this.getNavigation().moveTo((Path) null, speedModifier);
                     setTarget(null);
                     entityFear = null;
 
@@ -1767,7 +1769,7 @@ public class FairyEntity extends FairyEntityBase
                             setSitting(true);
                             jumping = false;
                             //this.navigation.stop();
-                            this.getNavigation().moveTo((Path) null, 0.3D);
+                            this.getNavigation().moveTo((Path) null, speedModifier);
                             setTarget(null);
                             entityFear = null;
                         }
@@ -1859,7 +1861,7 @@ public class FairyEntity extends FairyEntityBase
             Path dest = roam(ruler, this, (float) Math.PI);
 
             if (dest != null)
-                this.getNavigation().moveTo(dest, 0.3D);
+                this.getNavigation().moveTo(dest, speedModifier);
 
             if (ruler instanceof Player)
             {
@@ -2142,7 +2144,7 @@ public class FairyEntity extends FairyEntityBase
 //        jumping = false;
 //        moveForward = 0F;
 //        moveStrafing = 0F;
-//        navigation.moveTo((Path) null, 0.3D);
+//        navigation.moveTo((Path) null, speedModifier);
 //        setSitting(true);
 //        onGround = true;
 //        List list = level.getEntitiesOfClass(FairyEntity.class,
@@ -2166,7 +2168,7 @@ public class FairyEntity extends FairyEntityBase
 //                fairy.jumping = false;
 //                fairy.moveForward = 0F;
 //                fairy.moveStrafing = 0F;
-//                fairy.getNavigation().moveTo((Path) null, 0.3D);
+//                fairy.getNavigation().moveTo((Path) null, speedModifier);
 //                fairy.setSitting(true);
 //                fairy.onGround = true;
 //                // It feels like I'm floating but I'm not
@@ -2269,7 +2271,7 @@ public class FairyEntity extends FairyEntityBase
 
                         if (dest != null)
                         {
-                            this.getNavigation().moveTo(dest, 0.3D);
+                            this.getNavigation().moveTo(dest, speedModifier);
                         }
 
                     }
@@ -2289,7 +2291,7 @@ public class FairyEntity extends FairyEntityBase
 
                     if (dest != null)
                     {
-                        this.getNavigation().moveTo(dest, 0.3D);
+                        this.getNavigation().moveTo(dest, speedModifier);
                     }
                 }
             }
