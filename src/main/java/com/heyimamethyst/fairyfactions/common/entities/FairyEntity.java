@@ -164,7 +164,7 @@ public class FairyEntity extends FairyEntityBase
         this.goalSelector.addGoal(4, new FairyAI((this)));
 
         //this.goalSelector.addGoal(10, new FairyAIStroll(this, speedModifier, 1.0000001E-5F));
-        this.goalSelector.addGoal(4, new FairyAIStroll(this, speedModifier));
+        this.goalSelector.addGoal(4, new FairyAIStroll(this, 0.3D));
         this.goalSelector.addGoal(12, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(11, new LookAtPlayerGoal(this, Player.class, 10.0F));
     }
@@ -647,85 +647,85 @@ public class FairyEntity extends FairyEntityBase
 
         }
     }
-
-    @Override
-    public boolean isPersistenceRequired()
-    {
-        return ruler != null && tamed();
-    }
-
-    @Override
-    public void checkDespawn()
-    {
-        super.checkDespawn();
-
-        if (!this.isPersistenceRequired() && !this.requiresCustomPersistence())
-        {
-            Player player = level.getNearestPlayer(this, -1D);
-            net.minecraftforge.eventbus.api.Event.Result result = net.minecraftforge.event.ForgeEventFactory.canEntityDespawn(this);
-
-            if (result == net.minecraftforge.eventbus.api.Event.Result.DENY)
-            {
-                noActionTime = 0;
-                player = null;
-            }
-            else if (result == net.minecraftforge.eventbus.api.Event.Result.ALLOW)
-            {
-                this.discard();
-                player = null;
-            }
-
-            if (player != null)
-            {
-//            double d = ( (Entity) ( player ) ).position().x - position().x;
-//            double d1 = ( (Entity) ( player ) ).position().y - position().y;
-//            double d2 = ( (Entity) ( player ) ).position().z - position().z;
-//            double d3 = d * d + d1 * d1 + d2 * d2;
-
-                double d0 = player.distanceToSqr(this);
-                int i = this.getType().getCategory().getDespawnDistance();
-                int j = i * i;
-
-                if (d0 > (double)j && this.removeWhenFarAway(d0))
-                {
-                    //this.dead = true;
-                    // mod_FairyMod.fairyMod.sendFairyDespawn(this);
-
-                    if (queen())
-                    {
-                        despawnFollowers();
-                    }
-
-                    this.discard();
-                }
-
-                int k = this.getType().getCategory().getNoDespawnDistance();
-                int l = k * k;
-
-                if (this.noActionTime > 600 && this.random.nextInt(800) == 0 && d0 > (double)l && this.removeWhenFarAway(d0))
-                {
-                    // TODO: proxy
-                    //this.dead = true;
-
-                    // mod_FairyMod.fairyMod.sendFairyDespawn(this);
-                    if (queen())
-                    {
-                        despawnFollowers();
-                    }
-
-                    this.discard();
-                }
-                else if (d0 < (double)l)
-                {
-                    this.noActionTime = 0;
-                }
-            }
-        }
-        else
-        {
-            this.noActionTime = 0;
-        }
-    }
+//
+//    @Override
+//    public boolean isPersistenceRequired()
+//    {
+//        return ruler != null && tamed();
+//    }
+//
+//    @Override
+//    public void checkDespawn()
+//    {
+//        super.checkDespawn();
+//
+//        if (!this.isPersistenceRequired() && !this.requiresCustomPersistence())
+//        {
+//            Player player = level.getNearestPlayer(this, -1D);
+//            net.minecraftforge.eventbus.api.Event.Result result = net.minecraftforge.event.ForgeEventFactory.canEntityDespawn(this);
+//
+//            if (result == net.minecraftforge.eventbus.api.Event.Result.DENY)
+//            {
+//                noActionTime = 0;
+//                player = null;
+//            }
+//            else if (result == net.minecraftforge.eventbus.api.Event.Result.ALLOW)
+//            {
+//                this.discard();
+//                player = null;
+//            }
+//
+//            if (player != null)
+//            {
+////            double d = ( (Entity) ( player ) ).position().x - position().x;
+////            double d1 = ( (Entity) ( player ) ).position().y - position().y;
+////            double d2 = ( (Entity) ( player ) ).position().z - position().z;
+////            double d3 = d * d + d1 * d1 + d2 * d2;
+//
+//                double d0 = player.distanceToSqr(this);
+//                int i = this.getType().getCategory().getDespawnDistance();
+//                int j = i * i;
+//
+//                if (d0 > (double)j && this.removeWhenFarAway(d0))
+//                {
+//                    //this.dead = true;
+//                    // mod_FairyMod.fairyMod.sendFairyDespawn(this);
+//
+//                    if (queen())
+//                    {
+//                        despawnFollowers();
+//                    }
+//
+//                    this.discard();
+//                }
+//
+//                int k = this.getType().getCategory().getNoDespawnDistance();
+//                int l = k * k;
+//
+//                if (this.noActionTime > 600 && this.random.nextInt(800) == 0 && d0 > (double)l && this.removeWhenFarAway(d0))
+//                {
+//                    // TODO: proxy
+//                    //this.dead = true;
+//
+//                    // mod_FairyMod.fairyMod.sendFairyDespawn(this);
+//                    if (queen())
+//                    {
+//                        despawnFollowers();
+//                    }
+//
+//                    this.discard();
+//                }
+//                else if (d0 < (double)l)
+//                {
+//                    this.noActionTime = 0;
+//                }
+//            }
+//        }
+//        else
+//        {
+//            this.noActionTime = 0;
+//        }
+//    }
 
     public void despawnFollowers()
     {

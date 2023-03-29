@@ -1540,12 +1540,18 @@ public class FairyJob
                 || (i == Items.POTATO);
     }
 
+    private boolean isAdditionalItemPickup( final ItemStack item )
+    {
+        return item.is(ModItemTags.IS_ADDITIONAL_ITEM_PICKUP);
+    }
+
     // Items worth picking up
     private boolean goodItem(final ItemStack stack, final int j )
     {
         return isHoeItem( stack.getItem() ) || isSeedItem( stack.getItem() ) || isBonemealItem( stack.getItem()) || isAxeItem( stack.getItem() )
                 || isSaplingBlock( stack ) || isLogBlock( stack ) || FairyUtils.acceptableFoods(fairy, stack.getItem() )
                 ||  isBreedingItem( stack.getItem() ) ||  isShearingItem( stack.getItem() ) || isClothBlock( stack ) || isFishingItem( stack.getItem() )
-                || isAnimalProduct(stack.getItem()) || isRawFish( stack ) || isFishLoot(stack) || isFlower( stack.getItem()) || stack.is(Items.STICK) || stack.is(Blocks.PUMPKIN.asItem());
+                || isAnimalProduct(stack.getItem()) || isRawFish( stack ) || isFishLoot(stack) || isFlower( stack.getItem())
+                || stack.is(Items.STICK) || stack.is(Blocks.PUMPKIN.asItem())|| isAdditionalItemPickup(stack);
     }
 }

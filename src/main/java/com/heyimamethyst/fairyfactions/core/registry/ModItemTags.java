@@ -10,6 +10,7 @@ import net.minecraft.world.item.Item;
 public class ModItemTags
 {
 	public static final TagKey<Item> IS_FISH_LOOT = makeTag("is_fish_loot");
+	public static final TagKey<Item> IS_ADDITIONAL_ITEM_PICKUP = makeTag("is_additional_item_pickup");
 
 	private static TagKey<Item> bind(String p_203855_)
 	{
