@@ -475,6 +475,15 @@ public class FairyEntity extends FairyEntityBase
 
         }
 
+        if (flymode())
+        {
+            AttributeInstance speed = this
+                    .getAttribute(Attributes.MOVEMENT_SPEED);
+
+            speed.setBaseValue(speed.getValue() * 2.55D);
+
+        }
+
         if(!level.isClientSide)
         {
             updateWithering();
