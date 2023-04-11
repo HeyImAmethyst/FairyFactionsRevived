@@ -381,7 +381,12 @@ public class FairyJob
                 return true;
             }
 
-            if ( isSweetberryBlock(stack) && onSweetberryUse( stack, x, y, z, world ) )
+            if ( isSweetBerryBlock(stack) && onSweetBerryUse( stack, x, y, z, world ) )
+            {
+                return true;
+            }
+
+            if ( isBambooBlock(stack) && onBambooUse( stack, x, y, z, world ) )
             {
                 return true;
             }
@@ -560,7 +565,7 @@ public class FairyJob
         for ( int a = 0; a < 3; a++ )
         {
             //canPlaceBlockAt
-            if (state != null && !state.is(Blocks.SWEET_BERRY_BUSH) && !state.is(BlockTags.SAPLINGS) && world.getBlockState(new BlockPos(x,y,z)).getMaterial().isReplaceable() && state.canSurvive(world, new BlockPos(x,y,z)))//state.getMaterial().isReplaceable()) // world.getBlockState(new BlockPos(x,y,z).above()).is(Blocks.AIR) && state.canSurvive(world, new BlockPos(x,y,z)))
+            if (state != null && !state.is(Blocks.BAMBOO) && !state.is(Blocks.BAMBOO_SAPLING) && !state.is(Blocks.SWEET_BERRY_BUSH) && !state.is(BlockTags.SAPLINGS) && world.getBlockState(new BlockPos(x,y,z)).getMaterial().isReplaceable() && state.canSurvive(world, new BlockPos(x,y,z)))//state.getMaterial().isReplaceable()) // world.getBlockState(new BlockPos(x,y,z).above()).is(Blocks.AIR) && state.canSurvive(world, new BlockPos(x,y,z)))
             {
 
                 //FairyFactions.LOGGER.debug(this.fairy.toString()+": planting seed");
@@ -944,7 +949,7 @@ public class FairyJob
         return false;
     }
 
-    private boolean onSweetberryUse( final ItemStack stack, int x, final int y, int z, final Level world )
+    private boolean onSweetBerryUse(final ItemStack stack, int x, final int y, int z, final Level world )
     {
         // TODO: experiment more with sapling placing code. Fairies place saplings less frequently than intended
         //return true;
@@ -1032,6 +1037,94 @@ public class FairyJob
         return false;
     }
 
+    private boolean onBambooUse(final ItemStack stack, int x, final int y, int z, final Level world )
+    {
+        // TODO: experiment more with sapling placing code. Fairies place saplings less frequently than intended
+        //return true;
+
+        IPlantable plantable;
+
+        if (Block.byItem(stack.getItem()) instanceof IPlantable)
+        {
+            plantable = (IPlantable) Block.byItem(stack.getItem());
+        }
+        else
+        {
+            throw new NullPointerException("stack doesn't look plantable to me.");
+        }
+
+        final BlockState state = plantable.getPlant(world, new BlockPos(x,y,z));
+
+        for ( int a = 0; a < 3; a++ )
+        {
+            //canPlaceBlockAt
+            if (state.is(Blocks.BAMBOO) && world.getBlockState(new BlockPos(x,y,z)).getMaterial().isReplaceable() && state.canSurvive(world, new BlockPos(x,y,z)))//state.getMaterial().isReplaceable()) // world.getBlockState(new BlockPos(x,y,z).above()).is(Blocks.AIR) && state.canSurvive(world, new BlockPos(x,y,z)))
+            {
+
+                for (int l = -2; l < 3; l++)
+                {
+                    for (int i1 = -2; i1 < 3; i1++)
+                    {
+                        if (l == 0 && i1 == 0)
+                        {
+                            if (goodPlaceForBamboo(x + l, y, z + i1, world) > 0)
+                                return false;
+
+                            BlockPos pos = new BlockPos(x + l, y, z + i1);
+                            BlockState j1 = world.getBlockState(pos);
+
+                            if (!j1.is(Blocks.AIR) && !j1.is(Blocks.TALL_GRASS))
+                                return false;
+                        }
+                        else if (Math.abs(l) != 2 || Math.abs(i1) != 2)
+                        {
+                            boolean flag = false;
+                            int k1 = -1;
+                            while (k1 < 2)
+                            {
+                                int l1 = goodPlaceForBamboo(x + l, y + k1, z + i1, world);
+                                if (l1 == 2)
+                                    return false;
+                                if (l1 == 0)
+                                {
+                                    flag = true;
+                                    break;
+                                }
+                                k1++;
+                            }
+
+                            if (!flag)
+                                return false;
+                        }
+                    }
+                }
+
+                //FairyFactions.LOGGER.debug(this.fairy.toString()+": planting sapling");
+
+                world.setBlockAndUpdate(new BlockPos(x,y,z), Blocks.BAMBOO_SAPLING.defaultBlockState());
+                stack.shrink(1);
+
+                fairy.armSwing( !fairy.didSwing );
+                fairy.setTempItem(stack.getItem());
+
+                fairy.attackAnim = 30;
+
+                if ( fairy.flymode() && fairy.getFlyTime() > 0 )
+                {
+                    fairy.setFlyTime( 0 );
+                }
+
+                return true;
+            }
+
+            x += fairy.getRandom().nextInt( 3 ) - 1;
+            z += fairy.getRandom().nextInt( 3 ) - 1;
+
+        }
+
+        return false;
+    }
+
     // Check if it's a good place to put a sapling down
     private int goodPlaceForTrees( final int x, final int y, final int z, final Level world )
     {
@@ -1041,6 +1134,11 @@ public class FairyJob
     private int goodPlaceForBerryBush( final int x, final int y, final int z, final Level world )
     {
         return placePlantWithSpace(x, y, z, world, Blocks.SWEET_BERRY_BUSH);
+    }
+
+    private int goodPlaceForBamboo(final int x, final int y, final int z, final Level world )
+    {
+        return placePlantWithSpace(x, y, z, world, Blocks.BAMBOO_SAPLING);
     }
 
     public int placePlantWithSpace(final int x, final int y, final int z, final Level world, Block blockToCheck)
@@ -1717,6 +1815,7 @@ public class FairyJob
                 || block == Blocks.SUGAR_CANE && above == Blocks.SUGAR_CANE && below != Blocks.SUGAR_CANE
                 // cactus: break only when above sand and below cactus, to prevent losing drops.
                 || block == Blocks.CACTUS && above == Blocks.CACTUS && below != Blocks.CACTUS
+                || block == Blocks.BAMBOO && above == Blocks.BAMBOO && below != Blocks.BAMBOO
                 // melons/pumkins... always?
                 || block == Blocks.MELON || block == Blocks.PUMPKIN
                 || block == Blocks.COCOA && state.getValue(CocoaBlock.AGE) == 2
@@ -1748,9 +1847,14 @@ public class FairyJob
     }
 
     // Is the item a sweetberry?
-    private boolean isSweetberryBlock( final ItemStack item )
+    private boolean isSweetBerryBlock(final ItemStack item )
     {
         return item.is(Items.SWEET_BERRIES);
+    }
+
+    private boolean isBambooBlock(final ItemStack item )
+    {
+        return item.is(Items.BAMBOO);
     }
 
     // Is the item a log block?
