@@ -13,10 +13,12 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Sheep;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
@@ -379,6 +381,11 @@ public class FairyJob
                 return true;
             }
 
+            if ( isSweetberryBlock(stack) && onSweetberryUse( stack, x, y, z, world ) )
+            {
+                return true;
+            }
+
             // Breeding
             if (!triedBreeding && onBreedingUse(stack, world))
             {
@@ -454,6 +461,11 @@ public class FairyJob
                                  final Level world )
     {
         if ( cutTallGrass( x, y, z, world ) )
+        {
+            return true;
+        }
+
+        if (gatherSweetberry(x, y, z, world))
         {
             return true;
         }
@@ -548,7 +560,7 @@ public class FairyJob
         for ( int a = 0; a < 3; a++ )
         {
             //canPlaceBlockAt
-            if (state != null && /*!state.is(BlockTags.FLOWERS) && */!state.is(BlockTags.SAPLINGS) && world.getBlockState(new BlockPos(x,y,z)).getMaterial().isReplaceable() && state.canSurvive(world, new BlockPos(x,y,z)))//state.getMaterial().isReplaceable()) // world.getBlockState(new BlockPos(x,y,z).above()).is(Blocks.AIR) && state.canSurvive(world, new BlockPos(x,y,z)))
+            if (state != null && !state.is(Blocks.SWEET_BERRY_BUSH) && !state.is(BlockTags.SAPLINGS) && world.getBlockState(new BlockPos(x,y,z)).getMaterial().isReplaceable() && state.canSurvive(world, new BlockPos(x,y,z)))//state.getMaterial().isReplaceable()) // world.getBlockState(new BlockPos(x,y,z).above()).is(Blocks.AIR) && state.canSurvive(world, new BlockPos(x,y,z)))
             {
 
                 //FairyFactions.LOGGER.debug(this.fairy.toString()+": planting seed");
@@ -574,6 +586,65 @@ public class FairyJob
         }
 
         return false;
+    }
+
+    private boolean gatherSweetberry(int x, final int y, int z, final Level world )
+    {
+        final int m = x;
+        final int n = z;
+
+        for ( int a = 0; a < 9; a++ )
+        {
+            x = m + ((a / 3) % 9) - 1;
+            z = n + (a % 3) - 1;
+
+            if( harvestSweetberryBush( world, x, y, z) )
+            {
+                fairy.armSwing( !fairy.didSwing );
+
+                fairy.attackAnim = 30;
+
+                if ( !fairy.flymode() && fairy.getFlyTime() > 0 )
+                {
+                    fairy.setFlyTime( 0 );
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean harvestSweetberryBush( final Level world, final int x, final int y, final int z )
+    {
+        final BlockPos pos = new BlockPos(x,y,z);
+        final BlockState state = world.getBlockState(pos);
+        final Block block = state.getBlock();
+
+        if (state.is(Blocks.SWEET_BERRY_BUSH) )
+        {
+            int i = state.getValue(SweetBerryBushBlock.AGE);
+            boolean flag = i == 3;
+
+            if (i > 1)
+            {
+                int j = 1 + world.random.nextInt(2);
+                block.popResource(world, pos, new ItemStack(Items.SWEET_BERRIES, j + (flag ? 1 : 0)));
+                world.playSound((Player)null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + world.random.nextFloat() * 0.4F);
+                world.setBlock(pos, state.setValue(SweetBerryBushBlock.AGE, Integer.valueOf(1)), 2);
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
 
     // Use bonemeal to speed up wheat growth
@@ -873,6 +944,307 @@ public class FairyJob
         return false;
     }
 
+    private boolean onSweetberryUse( final ItemStack stack, int x, final int y, int z, final Level world )
+    {
+        // TODO: experiment more with sapling placing code. Fairies place saplings less frequently than intended
+        //return true;
+
+        IPlantable plantable;
+
+        if (Block.byItem(stack.getItem()) instanceof IPlantable)
+        {
+            plantable = (IPlantable) Block.byItem(stack.getItem());
+        }
+        else
+        {
+            throw new NullPointerException("stack doesn't look plantable to me.");
+        }
+
+        final BlockState state = plantable.getPlant(world, new BlockPos(x,y,z));
+
+        for ( int a = 0; a < 3; a++ )
+        {
+            //canPlaceBlockAt
+            if (state.is(Blocks.SWEET_BERRY_BUSH) && world.getBlockState(new BlockPos(x,y,z)).getMaterial().isReplaceable() && state.canSurvive(world, new BlockPos(x,y,z)))//state.getMaterial().isReplaceable()) // world.getBlockState(new BlockPos(x,y,z).above()).is(Blocks.AIR) && state.canSurvive(world, new BlockPos(x,y,z)))
+            {
+
+                for (int l = -2; l < 3; l++)
+                {
+                    for (int i1 = -2; i1 < 3; i1++)
+                    {
+                        if (l == 0 && i1 == 0)
+                        {
+                            if (goodPlaceForBerryBush(x + l, y, z + i1, world) > 0)
+                                return false;
+
+                            BlockPos pos = new BlockPos(x + l, y, z + i1);
+                            BlockState j1 = world.getBlockState(pos);
+
+                            if (!j1.is(Blocks.AIR) && !j1.is(Blocks.TALL_GRASS))
+                                return false;
+                        }
+                        else if (Math.abs(l) != 2 || Math.abs(i1) != 2)
+                        {
+                            boolean flag = false;
+                            int k1 = -1;
+                            while (k1 < 2)
+                            {
+                                int l1 = goodPlaceForBerryBush(x + l, y + k1, z + i1, world);
+                                if (l1 == 2)
+                                    return false;
+                                if (l1 == 0)
+                                {
+                                    flag = true;
+                                    break;
+                                }
+                                k1++;
+                            }
+
+                            if (!flag)
+                                return false;
+                        }
+                    }
+                }
+
+                //FairyFactions.LOGGER.debug(this.fairy.toString()+": planting sapling");
+
+                world.setBlockAndUpdate(new BlockPos(x,y,z), state);
+                stack.shrink(1);
+
+                fairy.armSwing( !fairy.didSwing );
+                fairy.setTempItem(stack.getItem());
+
+                fairy.attackAnim = 30;
+
+                if ( fairy.flymode() && fairy.getFlyTime() > 0 )
+                {
+                    fairy.setFlyTime( 0 );
+                }
+
+                return true;
+            }
+
+            x += fairy.getRandom().nextInt( 3 ) - 1;
+            z += fairy.getRandom().nextInt( 3 ) - 1;
+
+        }
+
+        return false;
+    }
+
+    // Check if it's a good place to put a sapling down
+    private int goodPlaceForTrees( final int x, final int y, final int z, final Level world )
+    {
+        return placePlantTagWithSpace(x, y, z, world, BlockTags.SAPLINGS);
+    }
+
+    private int goodPlaceForBerryBush( final int x, final int y, final int z, final Level world )
+    {
+        return placePlantWithSpace(x, y, z, world, Blocks.SWEET_BERRY_BUSH);
+    }
+
+    public int placePlantWithSpace(final int x, final int y, final int z, final Level world, Block blockToCheck)
+    {
+//        int saplingRadius = 4;
+//
+//        int i, j, k;
+//
+//        for ( int a = -saplingRadius; a <= saplingRadius; a++ )
+//        {
+//            for (int c = -saplingRadius; c <= saplingRadius; c++)
+//            {
+//                i = x + a;
+//                j = y;
+//                k = z + c;
+//
+//                BlockPos pos = new BlockPos(i,j,k);
+//                BlockState state = world.getBlockState(pos);
+//
+//                if(state.is(BlockTags.SAPLINGS))
+//                {
+//                    return 2;
+//                }
+//
+//                BlockState stateAbove = world.getBlockState(new BlockPos(i, j + 1, k));
+//
+//                if ( stateAbove.is(BlockTags.SAPLINGS))
+//                {
+//                    return 2;
+//                }
+//
+//                if (stateAbove.is(Blocks.AIR) && world.canSeeSky(new BlockPos( i, j + 1, k )) )
+//                {
+//                    return 0;
+//                }
+//            }
+//        }
+
+        BlockPos pos = new BlockPos(x,y,z);
+        BlockState state = world.getBlockState(pos);
+
+//        BlockPos north = pos.north();
+//        BlockPos south = pos.south();
+//        BlockPos east = pos.east();
+//        BlockPos west = pos.west();
+
+        BlockPos north = new BlockPos(pos.getX(), pos.getY(), pos.getZ() - 1);
+        BlockPos south = new BlockPos(pos.getX(), pos.getY(), pos.getZ() + 1);
+        BlockPos east = new BlockPos(pos.getX() + 1, pos.getY(), pos.getZ());
+        BlockPos west = new BlockPos(pos.getX() - 1, pos.getY(), pos.getZ());
+
+        BlockState northState = world.getBlockState(north);
+        BlockState southState = world.getBlockState(south);
+        BlockState eastState = world.getBlockState(east);
+        BlockState westState = world.getBlockState(west);
+
+        if(state.is(blockToCheck) && (!northState.is(blockToCheck)
+                && !southState.is(blockToCheck)
+                && !eastState.is(blockToCheck)
+                && !westState.is(blockToCheck)))
+        {
+            return 2;
+        }
+
+        BlockPos posAbove = new BlockPos(x, y + 1, z);
+        BlockState stateAbove = world.getBlockState(posAbove);
+
+        BlockPos posBelow = new BlockPos(x, y - 1, z);
+        BlockState stateBelow = world.getBlockState(posBelow);
+
+//        BlockPos northAbove = posAbove.north();
+//        BlockPos southAbove = posAbove.south();
+//        BlockPos eastAbove = posAbove.east();
+//        BlockPos westAbove = posAbove.west();
+
+        BlockPos northAbove = new BlockPos(posAbove.getX(), posAbove.getY(), posAbove.getZ() - 1);
+        BlockPos southAbove = new BlockPos(posAbove.getX(), posAbove.getY(), posAbove.getZ() + 1);
+        BlockPos eastAbove = new BlockPos(posAbove.getX() + 1, posAbove.getY(), posAbove.getZ());
+        BlockPos westAbove = new BlockPos(posAbove.getX() - 1, posAbove.getY(), posAbove.getZ());
+
+        BlockState northStateAbove = world.getBlockState(northAbove);
+        BlockState southStateAbove = world.getBlockState(southAbove);
+        BlockState eastStateAbove = world.getBlockState(eastAbove);
+        BlockState westStateAbove = world.getBlockState(westAbove);
+
+        if ( stateAbove.is(blockToCheck) && (!northStateAbove.is(blockToCheck)
+                && !southStateAbove.is(blockToCheck)
+                && !eastStateAbove.is(blockToCheck)
+                && !westStateAbove.is(blockToCheck)))
+        {
+            return 2;
+        }
+
+        if (stateAbove.is(Blocks.AIR) && world.canSeeSky(new BlockPos( x, y + 1, z )) && !stateBelow.is(blockToCheck))
+        {
+            return 0;
+        }
+
+        return 1;
+        //return (!stateAbove.is(Blocks.AIR) || !world.canSeeSky(new BlockPos( x, y + 1, z ))) ? 1 : 0;
+        //return canPlaceSapling(x, y + 1, z, j, world) ? 1 : 0;
+    }
+
+    public int placePlantTagWithSpace(final int x, final int y, final int z, final Level world, TagKey blockToCheck)
+    {
+//        int saplingRadius = 4;
+//
+//        int i, j, k;
+//
+//        for ( int a = -saplingRadius; a <= saplingRadius; a++ )
+//        {
+//            for (int c = -saplingRadius; c <= saplingRadius; c++)
+//            {
+//                i = x + a;
+//                j = y;
+//                k = z + c;
+//
+//                BlockPos pos = new BlockPos(i,j,k);
+//                BlockState state = world.getBlockState(pos);
+//
+//                if(state.is(BlockTags.SAPLINGS))
+//                {
+//                    return 2;
+//                }
+//
+//                BlockState stateAbove = world.getBlockState(new BlockPos(i, j + 1, k));
+//
+//                if ( stateAbove.is(BlockTags.SAPLINGS))
+//                {
+//                    return 2;
+//                }
+//
+//                if (stateAbove.is(Blocks.AIR) && world.canSeeSky(new BlockPos( i, j + 1, k )) )
+//                {
+//                    return 0;
+//                }
+//            }
+//        }
+
+        BlockPos pos = new BlockPos(x,y,z);
+        BlockState state = world.getBlockState(pos);
+
+//        BlockPos north = pos.north();
+//        BlockPos south = pos.south();
+//        BlockPos east = pos.east();
+//        BlockPos west = pos.west();
+
+        BlockPos north = new BlockPos(pos.getX(), pos.getY(), pos.getZ() - 1);
+        BlockPos south = new BlockPos(pos.getX(), pos.getY(), pos.getZ() + 1);
+        BlockPos east = new BlockPos(pos.getX() + 1, pos.getY(), pos.getZ());
+        BlockPos west = new BlockPos(pos.getX() - 1, pos.getY(), pos.getZ());
+
+        BlockState northState = world.getBlockState(north);
+        BlockState southState = world.getBlockState(south);
+        BlockState eastState = world.getBlockState(east);
+        BlockState westState = world.getBlockState(west);
+
+        if(state.is(blockToCheck) && (!northState.is(blockToCheck)
+                && !southState.is(blockToCheck)
+                && !eastState.is(blockToCheck)
+                && !westState.is(blockToCheck)))
+        {
+            return 2;
+        }
+
+        BlockPos posAbove = new BlockPos(x, y + 1, z);
+        BlockState stateAbove = world.getBlockState(posAbove);
+
+        BlockPos posBelow = new BlockPos(x, y - 1, z);
+        BlockState stateBelow = world.getBlockState(posBelow);
+
+//        BlockPos northAbove = posAbove.north();
+//        BlockPos southAbove = posAbove.south();
+//        BlockPos eastAbove = posAbove.east();
+//        BlockPos westAbove = posAbove.west();
+
+        BlockPos northAbove = new BlockPos(posAbove.getX(), posAbove.getY(), posAbove.getZ() - 1);
+        BlockPos southAbove = new BlockPos(posAbove.getX(), posAbove.getY(), posAbove.getZ() + 1);
+        BlockPos eastAbove = new BlockPos(posAbove.getX() + 1, posAbove.getY(), posAbove.getZ());
+        BlockPos westAbove = new BlockPos(posAbove.getX() - 1, posAbove.getY(), posAbove.getZ());
+
+        BlockState northStateAbove = world.getBlockState(northAbove);
+        BlockState southStateAbove = world.getBlockState(southAbove);
+        BlockState eastStateAbove = world.getBlockState(eastAbove);
+        BlockState westStateAbove = world.getBlockState(westAbove);
+
+        if ( stateAbove.is(blockToCheck) && (!northStateAbove.is(blockToCheck)
+                && !southStateAbove.is(blockToCheck)
+                && !eastStateAbove.is(blockToCheck)
+                && !westStateAbove.is(blockToCheck)))
+        {
+            return 2;
+        }
+
+        if (stateAbove.is(Blocks.AIR) && world.canSeeSky(new BlockPos( x, y + 1, z )) && !stateBelow.is(blockToCheck))
+        {
+            return 0;
+        }
+
+        return 1;
+        //return (!stateAbove.is(Blocks.AIR) || !world.canSeeSky(new BlockPos( x, y + 1, z ))) ? 1 : 0;
+        //return canPlaceSapling(x, y + 1, z, j, world) ? 1 : 0;
+    }
+
     // Attempt to breed animals
     private boolean onBreedingUse( final ItemStack stack, final Level world )
     {
@@ -1134,108 +1506,6 @@ public class FairyJob
         return pos != null;
     }
 
-    // Check if it's a good place to put a sapling down
-    private int goodPlaceForTrees( final int x, final int y, final int z, final Level world )
-    {
-//        int saplingRadius = 4;
-//
-//        int i, j, k;
-//
-//        for ( int a = -saplingRadius; a <= saplingRadius; a++ )
-//        {
-//            for (int c = -saplingRadius; c <= saplingRadius; c++)
-//            {
-//                i = x + a;
-//                j = y;
-//                k = z + c;
-//
-//                BlockPos pos = new BlockPos(i,j,k);
-//                BlockState state = world.getBlockState(pos);
-//
-//                if(state.is(BlockTags.SAPLINGS))
-//                {
-//                    return 2;
-//                }
-//
-//                BlockState stateAbove = world.getBlockState(new BlockPos(i, j + 1, k));
-//
-//                if ( stateAbove.is(BlockTags.SAPLINGS))
-//                {
-//                    return 2;
-//                }
-//
-//                if (stateAbove.is(Blocks.AIR) && world.canSeeSky(new BlockPos( i, j + 1, k )) )
-//                {
-//                    return 0;
-//                }
-//            }
-//        }
-
-        BlockPos pos = new BlockPos(x,y,z);
-        BlockState state = world.getBlockState(pos);
-
-//        BlockPos north = pos.north();
-//        BlockPos south = pos.south();
-//        BlockPos east = pos.east();
-//        BlockPos west = pos.west();
-
-        BlockPos north = new BlockPos(pos.getX(), pos.getY(), pos.getZ() - 1);
-        BlockPos south = new BlockPos(pos.getX(), pos.getY(), pos.getZ() + 1);
-        BlockPos east = new BlockPos(pos.getX() + 1, pos.getY(), pos.getZ());
-        BlockPos west = new BlockPos(pos.getX() - 1, pos.getY(), pos.getZ());
-
-        BlockState northState = world.getBlockState(north);
-        BlockState southState = world.getBlockState(south);
-        BlockState eastState = world.getBlockState(east);
-        BlockState westState = world.getBlockState(west);
-
-        if(state.is(BlockTags.SAPLINGS) && (!northState.is(BlockTags.SAPLINGS)
-                && !southState.is(BlockTags.SAPLINGS)
-                && !eastState.is(BlockTags.SAPLINGS)
-                && !westState.is(BlockTags.SAPLINGS)))
-        {
-            return 2;
-        }
-
-        BlockPos posAbove = new BlockPos(x, y + 1, z);
-        BlockState stateAbove = world.getBlockState(posAbove);
-
-        BlockPos posBelow = new BlockPos(x, y - 1, z);
-        BlockState stateBelow = world.getBlockState(posBelow);
-
-//        BlockPos northAbove = posAbove.north();
-//        BlockPos southAbove = posAbove.south();
-//        BlockPos eastAbove = posAbove.east();
-//        BlockPos westAbove = posAbove.west();
-
-        BlockPos northAbove = new BlockPos(posAbove.getX(), posAbove.getY(), posAbove.getZ() - 1);
-        BlockPos southAbove = new BlockPos(posAbove.getX(), posAbove.getY(), posAbove.getZ() + 1);
-        BlockPos eastAbove = new BlockPos(posAbove.getX() + 1, posAbove.getY(), posAbove.getZ());
-        BlockPos westAbove = new BlockPos(posAbove.getX() - 1, posAbove.getY(), posAbove.getZ());
-
-        BlockState northStateAbove = world.getBlockState(northAbove);
-        BlockState southStateAbove = world.getBlockState(southAbove);
-        BlockState eastStateAbove = world.getBlockState(eastAbove);
-        BlockState westStateAbove = world.getBlockState(westAbove);
-
-        if ( stateAbove.is(BlockTags.SAPLINGS) && (!northStateAbove.is(BlockTags.SAPLINGS)
-                && !southStateAbove.is(BlockTags.SAPLINGS)
-                && !eastStateAbove.is(BlockTags.SAPLINGS)
-                && !westStateAbove.is(BlockTags.SAPLINGS)))
-        {
-            return 2;
-        }
-
-        if (stateAbove.is(Blocks.AIR) && world.canSeeSky(new BlockPos( x, y + 1, z )) && !stateBelow.is(BlockTags.SAPLINGS))
-        {
-            return 0;
-        }
-
-        return 1;
-        //return (!stateAbove.is(Blocks.AIR) || !world.canSeeSky(new BlockPos( x, y + 1, z ))) ? 1 : 0;
-        //return canPlaceSapling(x, y + 1, z, j, world) ? 1 : 0;
-    }
-
     private boolean cutTallGrass( int x, final int y, int z, final Level world )
     {
         final int m = x;
@@ -1475,6 +1745,12 @@ public class FairyJob
     private boolean isSaplingBlock( final ItemStack item )
     {
         return item.is(ItemTags.SAPLINGS);
+    }
+
+    // Is the item a sweetberry?
+    private boolean isSweetberryBlock( final ItemStack item )
+    {
+        return item.is(Items.SWEET_BERRIES);
     }
 
     // Is the item a log block?

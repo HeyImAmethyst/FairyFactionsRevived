@@ -57,7 +57,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
@@ -371,6 +373,14 @@ public class FairyEntity extends FairyEntityBase
         else
         {
             return ModSounds.FAIRY_DEATH.get();
+        }
+    }
+
+    public void makeStuckInBlock(BlockState pState, Vec3 pMotionMultiplier)
+    {
+        if (!pState.is(Blocks.SWEET_BERRY_BUSH))
+        {
+            super.makeStuckInBlock(pState, pMotionMultiplier);
         }
     }
 
@@ -2212,6 +2222,11 @@ public class FairyEntity extends FairyEntityBase
             {
                 ignoreTarget = true;
             }
+        }
+
+        if(damagesource == DamageSource.SWEET_BERRY_BUSH)
+        {
+            return false;
         }
 
         if (tamed() && !rulerName().equals("") && entity != null)
