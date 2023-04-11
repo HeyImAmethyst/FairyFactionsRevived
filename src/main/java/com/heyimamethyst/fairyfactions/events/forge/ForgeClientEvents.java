@@ -42,26 +42,26 @@ public class ForgeClientEvents
 	{
 		Player player = mc.player;
 
-		if(key == 1 && action == 1)
+		//Code from https://github.com/V0idWa1k3r/ExPetrum/blob/e6a31dff9bd1b55cf65119bba6537c74c5da55fd/src/main/java/v0id/exp/combat/impl/ShieldSlam.java#L45
+
+		Vec3 look = player.getViewVector(0).scale(100);
+		Vec3 pos = player.getPosition(0);
+
+		List<LivingEntity> targets = EntityHelper.rayTraceEntities(player.level, pos.add(0, player.getEyeHeight(), 0), look, Optional.of(e -> e != player), LivingEntity.class);
+
+		LivingEntity assumedToBeLookedAt = EntityHelper.getClosest(targets, player);
+
+		if (assumedToBeLookedAt != null)
 		{
-			//Code from https://github.com/V0idWa1k3r/ExPetrum/blob/e6a31dff9bd1b55cf65119bba6537c74c5da55fd/src/main/java/v0id/exp/combat/impl/ShieldSlam.java#L45
+			//FairyFactions.LOGGER.debug("found closet entity " + assumedToBeLookedAt);
 
-			Vec3 look = player.getViewVector(0).scale(100);
-			Vec3 pos = player.getPosition(0);
-
-			List<LivingEntity> targets = EntityHelper.rayTraceEntities(player.level, pos.add(0, player.getEyeHeight(), 0), look, Optional.of(e -> e != player), LivingEntity.class);
-
-			LivingEntity assumedToBeLookedAt = EntityHelper.getClosest(targets, player);
-
-			if (assumedToBeLookedAt != null)
+			if(assumedToBeLookedAt instanceof FairyEntity)
 			{
-				//FairyFactions.LOGGER.debug("found closet entity " + assumedToBeLookedAt);
+				FairyEntity fairy = (FairyEntity) assumedToBeLookedAt;
 
-				if(assumedToBeLookedAt instanceof FairyEntity)
+				if(fairy.isPassenger() && player.getItemInHand(InteractionHand.MAIN_HAND) == ItemStack.EMPTY)
 				{
-					FairyEntity fairy = (FairyEntity) assumedToBeLookedAt;
-
-					if(fairy.isPassenger() && player.getItemInHand(InteractionHand.MAIN_HAND) == ItemStack.EMPTY)
+					if(key == 1 && action == 1 && !player.isShiftKeyDown())
 					{
 						FairyFactions.LOGGER.warn("Unmounting fairy "+fairy);
 						FairyFactions.commonMethods.sendFairyMount(fairy, player);
