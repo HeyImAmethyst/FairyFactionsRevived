@@ -354,7 +354,7 @@ public class FairyTasks
                         flag = false;
                         break;
                     }
-                    else if (fairy == theFairy && list.size() == 1)
+                    else if ( list == null || list.size() < 1 )
                     {
                         flag = true;
                     }
@@ -388,7 +388,7 @@ public class FairyTasks
                 if (theFairy.getLoseTeam() >= 75)
                 {
                     theFairy.setRuler(null);
-                    theFairy.disband();
+                    theFairy.disband("(lost its team)");
                     //theFairy.loseTeam = 0;
                     theFairy.setLoseTeam(0);
                     theFairy.setCryTime(0);

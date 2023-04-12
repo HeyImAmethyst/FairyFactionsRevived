@@ -657,85 +657,89 @@ public class FairyEntity extends FairyEntityBase
 
         }
     }
-//
+
 //    @Override
 //    public boolean isPersistenceRequired()
 //    {
-//        return ruler != null && tamed();
+//        return isRuler(Minecraft.getInstance().player) && tamed();
 //    }
-//
-//    @Override
-//    public void checkDespawn()
-//    {
-//        super.checkDespawn();
-//
-//        if (!this.isPersistenceRequired() && !this.requiresCustomPersistence())
-//        {
-//            Player player = level.getNearestPlayer(this, -1D);
-//            net.minecraftforge.eventbus.api.Event.Result result = net.minecraftforge.event.ForgeEventFactory.canEntityDespawn(this);
-//
-//            if (result == net.minecraftforge.eventbus.api.Event.Result.DENY)
-//            {
-//                noActionTime = 0;
-//                player = null;
-//            }
-//            else if (result == net.minecraftforge.eventbus.api.Event.Result.ALLOW)
-//            {
-//                this.discard();
-//                player = null;
-//            }
-//
-//            if (player != null)
-//            {
-////            double d = ( (Entity) ( player ) ).position().x - position().x;
-////            double d1 = ( (Entity) ( player ) ).position().y - position().y;
-////            double d2 = ( (Entity) ( player ) ).position().z - position().z;
-////            double d3 = d * d + d1 * d1 + d2 * d2;
-//
-//                double d0 = player.distanceToSqr(this);
-//                int i = this.getType().getCategory().getDespawnDistance();
-//                int j = i * i;
-//
-//                if (d0 > (double)j && this.removeWhenFarAway(d0))
-//                {
-//                    //this.dead = true;
-//                    // mod_FairyMod.fairyMod.sendFairyDespawn(this);
-//
-//                    if (queen())
-//                    {
-//                        despawnFollowers();
-//                    }
-//
-//                    this.discard();
-//                }
-//
-//                int k = this.getType().getCategory().getNoDespawnDistance();
-//                int l = k * k;
-//
-//                if (this.noActionTime > 600 && this.random.nextInt(800) == 0 && d0 > (double)l && this.removeWhenFarAway(d0))
-//                {
-//                    // TODO: proxy
-//                    //this.dead = true;
-//
-//                    // mod_FairyMod.fairyMod.sendFairyDespawn(this);
-//                    if (queen())
-//                    {
-//                        despawnFollowers();
-//                    }
-//
-//                    this.discard();
-//                }
-//                else if (d0 < (double)l)
-//                {
-//                    this.noActionTime = 0;
-//                }
-//            }
-//        }
-//        else
-//        {
-//            this.noActionTime = 0;
-//        }
-//    }
+
+    @Override
+    public void checkDespawn()
+    {
+        //super.checkDespawn();
+
+        if (this.level.getDifficulty() == Difficulty.PEACEFUL && this.shouldDespawnInPeaceful())
+        {
+            this.discard();
+        }
+        else if (!this.isPersistenceRequired() && !this.requiresCustomPersistence() && !isRuler(Minecraft.getInstance().player) && !tamed())
+        {
+            Player player = level.getNearestPlayer(this, -1D);
+            net.minecraftforge.eventbus.api.Event.Result result = net.minecraftforge.event.ForgeEventFactory.canEntityDespawn(this);
+
+            if (result == net.minecraftforge.eventbus.api.Event.Result.DENY)
+            {
+                noActionTime = 0;
+                player = null;
+            }
+            else if (result == net.minecraftforge.eventbus.api.Event.Result.ALLOW)
+            {
+                this.discard();
+                player = null;
+            }
+
+            if (player != null)
+            {
+//            double d = ( (Entity) ( player ) ).position().x - position().x;
+//            double d1 = ( (Entity) ( player ) ).position().y - position().y;
+//            double d2 = ( (Entity) ( player ) ).position().z - position().z;
+//            double d3 = d * d + d1 * d1 + d2 * d2;
+
+                double d0 = player.distanceToSqr(this);
+                int i = this.getType().getCategory().getDespawnDistance();
+                int j = i * i;
+
+                if (d0 > (double)j && this.removeWhenFarAway(d0))
+                {
+                    //this.dead = true;
+                    // mod_FairyMod.fairyMod.sendFairyDespawn(this);
+
+                    if (queen())
+                    {
+                        despawnFollowers();
+                    }
+
+                    this.discard();
+                }
+
+                int k = this.getType().getCategory().getNoDespawnDistance();
+                int l = k * k;
+
+                if (this.noActionTime > 600 && this.random.nextInt(800) == 0 && d0 > (double)l && this.removeWhenFarAway(d0))
+                {
+                    // TODO: proxy
+                    //this.dead = true;
+
+                    // mod_FairyMod.fairyMod.sendFairyDespawn(this);
+                    if (queen())
+                    {
+                        despawnFollowers();
+                    }
+
+                    this.discard();
+                }
+                else if (d0 < (double)l)
+                {
+                    this.noActionTime = 0;
+                }
+            }
+        }
+        else
+        {
+            this.noActionTime = 0;
+        }
+    }
 
     public void despawnFollowers()
     {
@@ -1705,7 +1709,7 @@ public class FairyEntity extends FairyEntityBase
 
                     stack.shrink(1);
 
-                    disband();
+                    disband("(ruler gave vile substance)");
 
                     return InteractionResult.SUCCESS;
                 }
@@ -1851,10 +1855,10 @@ public class FairyEntity extends FairyEntityBase
 
     //region Faction Logic
 
-    public void disband()
+    public void disband(String disbandReason)
     {
 
-        FairyFactions.LOGGER.info("disband: " + rulerName() + ": " + this);
+        FairyFactions.LOGGER.info("disband: " + rulerName() + ": " + this + " " + disbandReason);
 
         setRulerName("");
         setFaction(0);
@@ -2583,34 +2587,57 @@ public class FairyEntity extends FairyEntityBase
     @javax.annotation.Nullable
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType mobSpawnType, @javax.annotation.Nullable SpawnGroupData pSpawnData, @javax.annotation.Nullable CompoundTag pDataTag)
     {
-        boolean doCreateGroup = false; //= fairy.getRandom().nextInt(2) != 0;
-
-        //super.checkSpawnRules()
-        //int a = new Random().nextInt(11);
-
-        if (FairyUtils.percentChance(this, 0.6))
+        if(Animal.checkAnimalSpawnRules((EntityType<? extends Animal>) this.getType(), pLevel, mobSpawnType, this.blockPosition(), this.random))
         {
-            doCreateGroup = true;
-        }
-
-        if(ruler == null && !isRuler(Minecraft.getInstance().player) && getFaction() == 0 && doCreateGroup)
-        {
-            List list = this.level.getEntitiesOfClass(FairyEntity.class,
-                    this.getBoundingBox().inflate(32D, 32D, 32D));
-
-            if (( list == null || list.size() < 1 ) && !this.level.isClientSide)
+            if(ruler == null && !isRuler(Minecraft.getInstance().player) && getFaction() == 0)
             {
-                setJob(0);
-                setSpecialJob(true);
-                heal(30);
-                setHealth(30);
-                int i = random.nextInt(15) + 1;
-                setFaction(i);
-                setSkin(random.nextInt(4));
-                setCower(false);
-                createGroup = true;
+                boolean doCreateGroup = false; //= fairy.getRandom().nextInt(2) != 0;
+
+                //int a = new Random().nextInt(11);
+
+                if (FairyUtils.percentChance(this, 0.6))
+                {
+                    doCreateGroup = true;
+                }
+
+                if(doCreateGroup)
+                {
+                    List list = this.level.getEntitiesOfClass(FairyEntity.class,
+                            this.getBoundingBox().inflate(32D, 32D, 32D));
+
+                    if (( list == null || list.size() < 1 ) && !this.level.isClientSide)
+                    {
+                        setJob(0);
+                        setSpecialJob(true);
+                        heal(30);
+                        setHealth(30);
+                        int i = random.nextInt(15) + 1;
+                        setFaction(i);
+                        setSkin(random.nextInt(4));
+                        setCower(false);
+                        createGroup = true;
+                    }
+                }
             }
         }
+
+//        else if(ruler == null && !isRuler(Minecraft.getInstance().player) && getFaction() != 0)
+//        {
+//            List list = this.level.getEntitiesOfClass(FairyEntity.class,
+//                    this.getBoundingBox().inflate(32D, 32D, 32D));
+//
+//            for (int j = 0; j < list.size(); j++)
+//            {
+//                FairyEntity fairy = (FairyEntity) list.get(j);
+//
+//                if (fairy != this && FairyUtils.sameTeam(fairy, this)
+//                        && fairy.getHealth() > 0)
+//                {
+//                    flag = false;
+//                    break;
+//                }
+//            }
+//        }
 
         return super.finalizeSpawn(pLevel, pDifficulty, mobSpawnType, pSpawnData, pDataTag);
     }
