@@ -1417,21 +1417,21 @@ public class FairyEntity extends FairyEntityBase
 
             this.swingingArm = pHand;
 
-            boolean pUpdateSelf = true;
+//            boolean pUpdateSelf = true;
 
-            if (this.level instanceof ServerLevel)
-            {
-                ClientboundAnimatePacket clientboundanimatepacket = new ClientboundAnimatePacket(this, 0);
-                ServerChunkCache serverchunkcache = ((ServerLevel)this.level).getChunkSource();
-                if (pUpdateSelf)
-                {
-                    serverchunkcache.broadcastAndSend(this, clientboundanimatepacket);
-                }
-                else
-                {
-                    serverchunkcache.broadcast(this, clientboundanimatepacket);
-                }
-            }
+//            if (this.level instanceof ServerLevel)
+//            {
+//                ClientboundAnimatePacket clientboundanimatepacket = new ClientboundAnimatePacket(this, 0);
+//                ServerChunkCache serverchunkcache = ((ServerLevel)this.level).getChunkSource();
+//                if (pUpdateSelf)
+//                {
+//                    serverchunkcache.broadcastAndSend(this, clientboundanimatepacket);
+//                }
+//                else
+//                {
+//                    serverchunkcache.broadcast(this, clientboundanimatepacket);
+//                }
+//            }
         }
 
         if (isSwinging)
