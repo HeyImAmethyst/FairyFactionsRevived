@@ -3,6 +3,7 @@ package com.heyimamethyst.fairyfactions.common.world;
 import com.heyimamethyst.fairyfactions.common.entities.FairyEntity;
 import com.heyimamethyst.fairyfactions.core.registry.ModEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -35,7 +36,7 @@ public class FairyGroupGenerator
         this.radius = 8;
     }
 
-    public boolean generate(final Level world, final Random rand, final int i, final int j, final int k)
+    public boolean generate(final Level world, final RandomSource rand, final int i, final int j, final int k)
     {
         final List list = new ArrayList();
         int halfrad = radius / 2;

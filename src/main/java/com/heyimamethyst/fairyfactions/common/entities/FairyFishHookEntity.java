@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -45,7 +46,7 @@ public class FairyFishHookEntity extends Projectile
 {
 
     private static final Logger LOGGER = LogUtils.getLogger();
-    private final Random syncronizedRandom = new Random();
+    private final RandomSource syncronizedRandom = RandomSource.create();
     private boolean biting;
     private int outOfWaterTime;
     private static final int MAX_OUT_OF_WATER_TIME = 10;

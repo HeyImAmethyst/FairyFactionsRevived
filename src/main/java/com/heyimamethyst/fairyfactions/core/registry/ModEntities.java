@@ -14,7 +14,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModEntities
 {
-	public static final DeferredRegister<EntityType<?>> ENTITY_TYPES  = DeferredRegister.create(ForgeRegistries.ENTITIES, FairyFactions.MOD_ID);
+	public static final DeferredRegister<EntityType<?>> ENTITY_TYPES  = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, FairyFactions.MOD_ID);
 	
 	public static void Init(IEventBus modEventBus) 
 	{

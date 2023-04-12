@@ -21,7 +21,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
@@ -53,10 +55,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -317,8 +316,8 @@ public class FairyEntity extends FairyEntityBase
 
         //.add(Attributes.FLYING_SPEED, (double)0.6F).add(Attributes.FOLLOW_RANGE);
         return Mob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, FairyConfig.GENERAL_HEALTH_BASE.get())
-                .add(Attributes.MOVEMENT_SPEED, FairyConfig.GENERAL_SPEED_BASE.get())
+                .add(Attributes.MAX_HEALTH, 15.0D)
+                .add(Attributes.MOVEMENT_SPEED, 1)
                 .add(Attributes.FLYING_SPEED, (double)0.6F)
                 .add(Attributes.FOLLOW_RANGE)
                 .add(Attributes.LUCK);
@@ -463,6 +462,12 @@ public class FairyEntity extends FairyEntityBase
                 // setDead(); // For singleplayer mode
             }
         }
+
+        this.getAttribute(Attributes.MAX_HEALTH)
+                .setBaseValue(FairyConfig.GENERAL_HEALTH_BASE.get());
+
+//        this.getAttribute(Attributes.MOVEMENT_SPEED)
+//                .setBaseValue(FairyConfig.GENERAL_SPEED_BASE.get());
 
         this.getAttribute(Attributes.FOLLOW_RANGE)
                 .setBaseValue(FairyConfig.BEHAVIOR_PATH_RANGE.get());
@@ -1100,7 +1105,8 @@ public class FairyEntity extends FairyEntityBase
             if (!level.isClientSide)
                 this.level.addFreshEntity(hook);
 
-            level.gameEvent(this, GameEvent.FISHING_ROD_CAST, this);
+            //TODO: GameEvent.FISHING_ROD_CAST no exist anymore?
+            //level.gameEvent(this, GameEvent.FISHING_ROD_CAST, this);
 
             armSwing(!this.didSwing);
             setTempItem(Items.STICK);
@@ -1244,13 +1250,13 @@ public class FairyEntity extends FairyEntityBase
             {
                 String q = Loc.QUEEN.get();
 
-                Component queenName = new TranslatableComponent(q).withStyle(FairyUtils.faction_colors_formatting[getFaction()]).append(getQueenName2(getNamePrefix(), getNameSuffix(), getFaction()));
+                Component queenName = Component.translatable(q).withStyle(FairyUtils.faction_colors_formatting[getFaction()]).append(getQueenName2(getNamePrefix(), getNameSuffix(), getFaction()));
 
                 return queenName;
             }
             else
             {
-                Component factionName = new TextComponent(getFactionName(getFaction()));
+                Component factionName = Component.literal(getFactionName(getFaction()));
 
                 return factionName;
             }
@@ -1270,13 +1276,13 @@ public class FairyEntity extends FairyEntityBase
 
             if (isRuler(FairyFactions.clientMethods.getCurrentPlayer()))
             {
-                name = new TextComponent(( posted() ? "§a" : "§c") + "@§f").append(new TranslatableComponent(q)).append(woosh).append(( posted() ? "§a" : "§c") + "@");
+                name = Component.literal(( posted() ? "§a" : "§c") + "@§f").append(Component.translatable(q)).append(woosh).append(( posted() ? "§a" : "§c") + "@");
             }
             else
             {
                 //name = new TranslatableComponent(q).append(woosh);
 
-                name = PlayerTeam.formatNameForTeam(this.getTeam(), new TranslatableComponent(q).append(woosh)).withStyle((p_185975_) ->
+                name = PlayerTeam.formatNameForTeam(this.getTeam(), Component.translatable(q).append(woosh)).withStyle((p_185975_) ->
                 {
                     return p_185975_.withHoverEvent(this.createHoverEvent()).withInsertion(this.getStringUUID());
                 });
@@ -1634,6 +1640,11 @@ public class FairyEntity extends FairyEntityBase
         }
     }
 
+    public float getBrightness()
+    {
+        return this.level.hasChunkAt(this.getBlockX(), this.getBlockZ()) ? this.level.getBrightness(LightLayer.SKY, new BlockPos(this.getX(), this.getEyeY(), this.getZ())) : 0.0F;
+    }
+
     @Override
     public void setTarget(@Nullable LivingEntity entity)
     {
@@ -1930,7 +1941,7 @@ public class FairyEntity extends FairyEntityBase
 
                 if (ruler instanceof ServerPlayer)
                 {
-                    FairyFactions.commonMethods.sendChat((ServerPlayer) ruler, new TranslatableComponent(finalQueenString).append(name).append(new TranslatableComponent(finalS)));
+                    FairyFactions.commonMethods.sendChat((ServerPlayer) ruler, Component.translatable(finalQueenString).append(name).append(Component.translatable(finalS)));
                 }
             }
         }
@@ -2021,7 +2032,7 @@ public class FairyEntity extends FairyEntityBase
             String finalS = s;
             String finalMessage = message;
 
-            FairyFactions.commonMethods.sendChat((ServerPlayer) ruler, new TranslatableComponent(finalS).append(n).append(new TranslatableComponent(finalMessage)));
+            FairyFactions.commonMethods.sendChat((ServerPlayer) ruler, Component.translatable(finalS).append(n).append(Component.translatable(finalMessage)));
         }
 
         FairyFactions.LOGGER.info("tameMe: " + rulerName() + ": " + this);
@@ -2140,7 +2151,7 @@ public class FairyEntity extends FairyEntityBase
             String finalS = s;
             String finalS1 = s2;
 
-            FairyFactions.commonMethods.sendChat((ServerPlayer) ruler, new TranslatableComponent(finalS).append(n).append(new TranslatableComponent(finalS1)));
+            FairyFactions.commonMethods.sendChat((ServerPlayer) ruler, Component.translatable(finalS).append(n).append(Component.translatable(finalS1)));
         }
     }
 
@@ -2494,7 +2505,7 @@ public class FairyEntity extends FairyEntityBase
         if (player instanceof ServerPlayer)
         {
             String finalS = s2;
-            FairyFactions.commonMethods.sendChat((ServerPlayer) player, new TranslatableComponent(s).append(new TranslatableComponent(finalS)));
+            FairyFactions.commonMethods.sendChat((ServerPlayer) player, Component.translatable(s).append(Component.translatable(finalS)));
 
         }
     }
@@ -2584,10 +2595,15 @@ public class FairyEntity extends FairyEntityBase
         return this.loseTeam;
     }
 
+    public static boolean checkFairySpawnRules(EntityType<? extends FairyEntity> pFairy, LevelAccessor pLevel, MobSpawnType pSpawnType, BlockPos pPos, RandomSource pRandom)
+    {
+        return pLevel.getBlockState(pPos.below()).is(BlockTags.ANIMALS_SPAWNABLE_ON) && isBrightEnoughToSpawn(pLevel, pPos);
+    }
+
     @javax.annotation.Nullable
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType mobSpawnType, @javax.annotation.Nullable SpawnGroupData pSpawnData, @javax.annotation.Nullable CompoundTag pDataTag)
     {
-        if(Animal.checkAnimalSpawnRules((EntityType<? extends Animal>) this.getType(), pLevel, mobSpawnType, this.blockPosition(), this.random))
+        if(FairyEntity.checkFairySpawnRules((EntityType<? extends FairyEntity>) this.getType(), pLevel, mobSpawnType, this.blockPosition(), this.random))
         {
             if(ruler == null && !isRuler(Minecraft.getInstance().player) && getFaction() == 0)
             {

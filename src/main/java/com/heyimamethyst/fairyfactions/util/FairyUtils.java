@@ -6,7 +6,7 @@ import com.heyimamethyst.fairyfactions.common.entities.FairyEntityBase;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.*;
 import net.minecraft.world.entity.projectile.FishingHook;
@@ -19,6 +19,10 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.pathfinder.Path;
 
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Random;
+import java.util.RandomAccess;
 
 public class FairyUtils
 {
@@ -59,7 +63,7 @@ public class FairyUtils
         if (!name.equals(""))
         {
             //entity.setFairyCustomName(name);
-            entity.setCustomName(new TextComponent(name));
+            entity.setCustomName(Component.literal(name));
         }
         else if(name == null || name.equals(""))
         {
@@ -195,5 +199,51 @@ public class FairyUtils
         return thing == Pig.class || thing == Cow.class
                 || thing == Chicken.class || thing == Sheep.class
                 || thing == MushroomCow.class;
+    }
+
+    public static void shuffle(List<?> list, RandomSource rnd)
+    {
+        int SHUFFLE_THRESHOLD = 5;
+        int size = list.size();
+        if (size < SHUFFLE_THRESHOLD || list instanceof RandomAccess)
+        {
+            for (int i=size; i>1; i--)
+                swap(list, i-1, rnd.nextInt(i));
+        }
+        else
+        {
+            Object[] arr = list.toArray();
+
+            // Shuffle array
+            for (int i=size; i>1; i--)
+                swap(arr, i-1, rnd.nextInt(i));
+
+            // Dump array back into list
+            // instead of using a raw type here, it's possible to capture
+            // the wildcard but it will require a call to a supplementary
+            // private method
+            ListIterator it = list.listIterator();
+            for (Object e : arr)
+            {
+                it.next();
+                it.set(e);
+            }
+        }
+    }
+
+    public static void swap(List<?> list, int i, int j)
+    {
+        // instead of using a raw type here, it's possible to capture
+        // the wildcard but it will require a call to a supplementary
+        // private method
+        final List l = list;
+        l.set(i, l.set(j, l.get(i)));
+    }
+
+    private static void swap(Object[] arr, int i, int j)
+    {
+        Object tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
     }
 }

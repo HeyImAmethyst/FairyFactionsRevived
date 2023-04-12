@@ -41,15 +41,17 @@ public class FairyFactions
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::setup);
 
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, FairyConfig.SPEC, "fairyfactions-common.toml");
+
         ModEntities.Init(modEventBus);
         ModItems.Init(modEventBus);
         ModSounds.Init(modEventBus);
-
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, FairyConfig.SPEC, "fairyfactions-common.toml");
+        //ModBiomeModifiers.Init(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ModEvents::gen);
+        //MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ModEvents::gen);
+        //modEventBus.addListener(ModEvents::registerSpawnPlacements);
     }
 
     private void setup(final FMLCommonSetupEvent event)
@@ -57,8 +59,8 @@ public class FairyFactions
 
         event.enqueueWork(() ->
         {
+            //ModSpawns.registerSpawns();
             ModNetwork.registerMessages();
-            ModSpawns.registerSpawns();
         });
 
         FairyConfig.BEHAVIOR_PURSUE_RANGE.set(FairyConfig.BEHAVIOR_PATH_RANGE.get().doubleValue() * FairyConfig.pursue_range_mult.get().doubleValue());

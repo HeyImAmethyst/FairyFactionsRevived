@@ -565,7 +565,7 @@ public class FairyJob
         for ( int a = 0; a < 3; a++ )
         {
             //canPlaceBlockAt
-            if (state != null && !state.is(Blocks.BAMBOO) && !state.is(Blocks.BAMBOO_SAPLING) && !state.is(Blocks.SWEET_BERRY_BUSH) && !state.is(BlockTags.SAPLINGS) && world.getBlockState(new BlockPos(x,y,z)).getMaterial().isReplaceable() && state.canSurvive(world, new BlockPos(x,y,z)))//state.getMaterial().isReplaceable()) // world.getBlockState(new BlockPos(x,y,z).above()).is(Blocks.AIR) && state.canSurvive(world, new BlockPos(x,y,z)))
+            if (state != null && !state.is(Blocks.MELON) && !state.is(Blocks.PUMPKIN) && !state.is(Blocks.BAMBOO) && !state.is(Blocks.BAMBOO_SAPLING) && !state.is(Blocks.SWEET_BERRY_BUSH) && !state.is(BlockTags.SAPLINGS) && world.getBlockState(new BlockPos(x,y,z)).getMaterial().isReplaceable() && state.canSurvive(world, new BlockPos(x,y,z)))//state.getMaterial().isReplaceable()) // world.getBlockState(new BlockPos(x,y,z).above()).is(Blocks.AIR) && state.canSurvive(world, new BlockPos(x,y,z)))
             {
 
                 //FairyFactions.LOGGER.debug(this.fairy.toString()+": planting seed");

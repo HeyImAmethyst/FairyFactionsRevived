@@ -1,0 +1,20 @@
+{
+	"replace": false,
+	"values": 
+	[
+		"minecraft:plains",
+		"minecraft:snowy_plains",
+		"minecraft:meadow",
+		"minecraft:sunflower_plains",
+		"#minecraft:is_forest",
+		"minecraft:jagged_peaks",
+		"minecraft:frozen_peaks",
+		"minecraft:stony_peaks",
+		"minecraft:savanna_plateau",
+		"minecraft:wooded_badlands",
+		"minecraft:meadow",
+		"minecraft:grove",
+		"minecraft:snowy_slopes",
+		"minecraft:mushroom_fields"
+	]
+}

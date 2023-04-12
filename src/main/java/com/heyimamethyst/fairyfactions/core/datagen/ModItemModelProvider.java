@@ -1,6 +1,7 @@
 package com.heyimamethyst.fairyfactions.core.datagen;
 
 import com.heyimamethyst.fairyfactions.FairyFactions;
+import com.heyimamethyst.fairyfactions.common.items.ModSpawnEggItem;
 import com.heyimamethyst.fairyfactions.core.registry.ModItems;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
@@ -10,6 +11,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ModItemModelProvider extends ItemModelProvider
 {
@@ -21,13 +23,13 @@ public class ModItemModelProvider extends ItemModelProvider
 	@Override
 	protected void registerModels()
 	{
-		spawnEggItem(ModItems.FAIRY_SPAWN_EGG.get());
+		spawnEggItem(ModItems.FAIRY_SPAWN_EGG);
 
 	}
 	
-	private ItemModelBuilder spawnEggItem(Item item)
+	private ItemModelBuilder spawnEggItem(RegistryObject<ModSpawnEggItem> item)
 	{
-		return withExistingParent(item.getRegistryName().getPath(),
+		return withExistingParent(item.getId().getPath(),
 						new ResourceLocation("item/template_spawn_egg"));
 	}
 }

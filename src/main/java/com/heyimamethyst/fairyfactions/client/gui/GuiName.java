@@ -7,7 +7,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.client.gui.widget.ExtendedButton;
 
 public class GuiName extends Screen
@@ -21,7 +21,7 @@ public class GuiName extends Screen
 
     public GuiName(FairyEntity fairyEntity)
     {
-        super(new TextComponent(""));
+        super(Component.literal(""));
 
         FairyFactions.LOGGER.info("GuiName: constructed");
 
@@ -38,7 +38,7 @@ public class GuiName extends Screen
     @Override
     public void init()
     {
-        done = new ExtendedButton((width / 2 - 100) + 50, height / 4 + 120, 98, 20, new TextComponent("Done"),
+        done = new ExtendedButton((width / 2 - 100) + 50, height / 4 + 120, 98, 20, Component.literal("Done"),
         (p_96788_) ->
         {
             ConfirmName();

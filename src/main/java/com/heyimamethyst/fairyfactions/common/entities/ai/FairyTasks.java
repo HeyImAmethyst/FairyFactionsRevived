@@ -417,7 +417,8 @@ public class FairyTasks
         List list = theFairy.level.getEntities(theFairy,
                 theFairy.getBoundingBox().inflate(16D, 16D, 16D));
 
-        Collections.shuffle(list, theFairy.getRandom());
+        //Collections.shuffle(list, theFairy.getRandom());
+        FairyUtils.shuffle(list, theFairy.getRandom());
 
         for (int j = 0; j < list.size(); j++)
         {
@@ -656,7 +657,8 @@ public class FairyTasks
 
         List list = theFairy.level.getEntities(theFairy,
                 theFairy.getBoundingBox().inflate(16D, 16D, 16D));
-        Collections.shuffle(list, theFairy.getRandom());
+        //Collections.shuffle(list, theFairy.getRandom());
+        FairyUtils.shuffle(list, theFairy.getRandom());
 
         for (int j = 0; j < list.size(); j++)
         {
