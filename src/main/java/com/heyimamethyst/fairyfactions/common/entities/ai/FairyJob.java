@@ -498,12 +498,18 @@ public class FairyJob
         for ( int a = 0; a < 3; a++ )
         {
             BlockPos blockPos = new BlockPos(x, y, z);
+
+            if(fairy.flymode())
+            {
+                blockPos = new BlockPos(x, y - 2, z);
+            }
+
             BlockState blockState = world.getBlockState(blockPos);
             final Block i = blockState.getBlock();
 
             //BlockState toolModifiedState = world.getBlockState(blockPos).getToolModifiedState(pContext, net.minecraftforge.common.ToolActions.HOE_TILL, false);
 
-            if ( world.getBlockState(new BlockPos(x, y + 1, z )).is(Blocks.AIR) && !(world.getBlockState(blockPos).getBlock() instanceof SlabBlock))
+            if ( world.getBlockState(new BlockPos(x, y + 1, z )).is(Blocks.AIR))
             {
                 //&& (i == Blocks.GRASS_BLOCK || i == Blocks.DIRT)
                 final Block block = i == Blocks.COARSE_DIRT ? Blocks.DIRT : Blocks.FARMLAND;
