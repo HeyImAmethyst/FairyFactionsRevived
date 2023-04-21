@@ -261,7 +261,7 @@ public class FairyJob
 
                     final BlockPos pos = new BlockPos(i, j, k);
 
-                    if ( world.getBlockState(pos).getBlock() == Blocks.CHEST )
+                    if ( world.getBlockState(pos).getBlock() instanceof ChestBlock )
                     {
                         final BlockEntity blockEntity = world.getBlockEntity(pos);
 
@@ -313,7 +313,7 @@ public class FairyJob
 
                     final BlockPos pos = new BlockPos( i, j, k );
 
-                    if ( world.getBlockState(pos).getBlock() == Blocks.CHEST )
+                    if ( world.getBlockState(pos).getBlock() instanceof ChestBlock )
                     {
                         final BlockEntity tent = world.getBlockEntity(pos);
 
@@ -497,11 +497,16 @@ public class FairyJob
     {
         for ( int a = 0; a < 3; a++ )
         {
-            final Block i = world.getBlockState(new BlockPos(x, y, z)).getBlock();
+            BlockPos blockPos = new BlockPos(x, y, z);
+            BlockState blockState = world.getBlockState(blockPos);
+            final Block i = blockState.getBlock();
 
-            if ( world.getBlockState(new BlockPos(x, y + 1, z )).is(Blocks.AIR) && (i == Blocks.GRASS_BLOCK || i == Blocks.DIRT) )
+            //BlockState toolModifiedState = world.getBlockState(blockPos).getToolModifiedState(pContext, net.minecraftforge.common.ToolActions.HOE_TILL, false);
+
+            if ( world.getBlockState(new BlockPos(x, y + 1, z )).is(Blocks.AIR) && !(world.getBlockState(blockPos).getBlock() instanceof SlabBlock))
             {
-                final Block block = Blocks.FARMLAND;
+                //&& (i == Blocks.GRASS_BLOCK || i == Blocks.DIRT)
+                final Block block = i == Blocks.COARSE_DIRT ? Blocks.DIRT : Blocks.FARMLAND;
 
                 //FairyFactions.LOGGER.debug(this.fairy.toString()+": hoeing land");
 
