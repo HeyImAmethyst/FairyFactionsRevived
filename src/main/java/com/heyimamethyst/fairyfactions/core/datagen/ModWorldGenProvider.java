@@ -1,9 +1,12 @@
 package com.heyimamethyst.fairyfactions.core.datagen;
 
+import com.google.gson.JsonElement;
 import com.heyimamethyst.fairyfactions.FairyFactions;
+import com.heyimamethyst.fairyfactions.core.registry.ModBiomeTags;
 import com.heyimamethyst.fairyfactions.core.registry.ModEntities;
 import net.minecraft.core.HolderSet;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -16,9 +19,9 @@ import java.util.Arrays;
 
 public class ModWorldGenProvider extends WorldgenProvider
 {
-    ModWorldGenProvider(DataGenerator generator, ExistingFileHelper existingFileHelper)
+    ModWorldGenProvider(DataGenerator generator, ExistingFileHelper existingFileHelper, RegistryOps<JsonElement> ops)
     {
-        super(generator, existingFileHelper, FairyFactions.MOD_ID);
+        super(generator, existingFileHelper, ops, FairyFactions.MOD_ID);
     }
 
     @Override
@@ -36,7 +39,6 @@ public class ModWorldGenProvider extends WorldgenProvider
     @Override
     protected void generateBiomeModifiers()
     {
-        //biomeModifier("fairy_spawns", ForgeBiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(and(biomeTag(Tags.Biomes.IS_PLAINS), biomeTag(BiomeTags.IS_FOREST), biomeTag(Tags.Biomes.IS_MOUNTAIN), biomeTag(Tags.Biomes.IS_MUSHROOM)), new MobSpawnSettings.SpawnerData(ModEntities.FAIRY_ENTITY.get(), 60, 1, 4)));
-        //biomeModifier("fairy_spawns", ForgeBiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(BiomeTags.IS_OVERWORLD, new MobSpawnSettings.SpawnerData(ModEntities.FAIRY_ENTITY.get(), 60, 1, 4)));
+        biomeModifier("fairy_spawns", ForgeBiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(getBiomeTag(ModBiomeTags.IS_FAIRY_BIOME), new MobSpawnSettings.SpawnerData(ModEntities.FAIRY_ENTITY.get(), 40, 1, 4)));
     }
 }

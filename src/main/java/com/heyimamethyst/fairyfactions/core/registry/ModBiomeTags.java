@@ -12,10 +12,10 @@ public class ModBiomeTags
 
     private static TagKey<Biome> makeTag(String p_203855_)
     {
-        return TagKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(p_203855_));
+        return TagKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(FairyFactions.MOD_ID, p_203855_));
     }
 
-    public static TagKey<Biome> create(final ResourceLocation name)
+    public static TagKey<Biome> makeTag(final ResourceLocation name)
     {
         return TagKey.create(Registry.BIOME_REGISTRY, name);
     }

@@ -62,15 +62,17 @@ public abstract class WorldgenProvider implements DataProvider
     private final Map<ResourceLocation, PlacedFeature> pfs = new HashMap<>();
     private final Map<ResourceLocation, BiomeModifier> bms = new HashMap<>();
     private final RegistryAccess.Writable registryAccess;
+    final RegistryOps<JsonElement> ops;
     private final JsonCodecProvider<ConfiguredFeature<?, ?>> cfProvider;
     private final JsonCodecProvider<PlacedFeature> pfProvider;
     private final JsonCodecProvider<BiomeModifier> bmProvider;
 
-    public WorldgenProvider(DataGenerator generator, ExistingFileHelper existingFileHelper, String namespace)
+    public WorldgenProvider(DataGenerator generator, ExistingFileHelper existingFileHelper, RegistryOps<JsonElement> ops, String namespace)
     {
         this.namespace = namespace;
         this.registryAccess = RegistryAccess.builtinCopy();
-        RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, registryAccess);
+        //RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, registryAccess);
+        this.ops = ops;
         this.cfProvider = JsonCodecProvider.forDatapackRegistry(generator, existingFileHelper, namespace, ops, Registry.CONFIGURED_FEATURE_REGISTRY, cfs);
         this.pfProvider = JsonCodecProvider.forDatapackRegistry(generator, existingFileHelper, namespace, ops, Registry.PLACED_FEATURE_REGISTRY, pfs);
         this.bmProvider = JsonCodecProvider.forDatapackRegistry(generator, existingFileHelper, namespace, ops, ForgeRegistries.Keys.BIOME_MODIFIERS, bms);
@@ -153,6 +155,11 @@ public abstract class WorldgenProvider implements DataProvider
     protected HolderSet<Biome> biome(ResourceKey<Biome> tag)
     {
         return HolderSet.direct(getHolderOrThrow(Registry.BIOME_REGISTRY, tag.location()));
+    }
+
+    protected HolderSet<Biome> getBiomeTag(TagKey<Biome> tag)
+    {
+        return new HolderSet.Named<>(ops.registry(Registry.BIOME_REGISTRY).orElseThrow(), tag);
     }
 
     protected abstract void generateConfiguredFeatures();

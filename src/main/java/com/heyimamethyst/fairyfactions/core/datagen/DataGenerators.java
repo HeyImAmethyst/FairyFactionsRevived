@@ -45,7 +45,7 @@ public class DataGenerators
 				.create();
 
 			generator.addProvider(true, new ModItemModelProvider(generator, existingFileHelper));
-			generator.addProvider(true, new ModWorldGenProvider(generator, existingFileHelper));
+			generator.addProvider(true, new ModWorldGenProvider(generator, existingFileHelper, ops));
 	}
 	
 //	/* Helper method that serializes many objects of the same registry type for us (note the vararg)*/
