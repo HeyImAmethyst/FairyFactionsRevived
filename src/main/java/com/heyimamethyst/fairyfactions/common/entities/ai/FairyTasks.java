@@ -17,9 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SignBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.pathfinder.Path;
@@ -1007,25 +1005,11 @@ public class FairyTasks
 
     private boolean isStandingSign(Block block)
     {
-        return (block == Blocks.ACACIA_SIGN)
-                || (block == Blocks.BIRCH_SIGN)
-                || (block == Blocks.SPRUCE_SIGN)
-                || (block == Blocks.CRIMSON_SIGN)
-                || (block == Blocks.DARK_OAK_SIGN)
-                || (block == Blocks.JUNGLE_SIGN)
-                || (block == Blocks.OAK_SIGN
-                || (block == Blocks.WARPED_SIGN));
+        return block instanceof StandingSignBlock;
     }
 
     private boolean isWallSign(Block block)
     {
-        return (block == Blocks.ACACIA_WALL_SIGN)
-                || (block == Blocks.BIRCH_WALL_SIGN)
-                || (block == Blocks.SPRUCE_WALL_SIGN)
-                || (block == Blocks.CRIMSON_WALL_SIGN)
-                || (block == Blocks.DARK_OAK_WALL_SIGN)
-                || (block == Blocks.JUNGLE_WALL_SIGN)
-                || (block == Blocks.OAK_WALL_SIGN
-                || (block == Blocks.WARPED_WALL_SIGN));
+        return block instanceof WallSignBlock;
     }
 }
