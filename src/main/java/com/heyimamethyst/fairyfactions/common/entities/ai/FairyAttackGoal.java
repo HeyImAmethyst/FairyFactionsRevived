@@ -2,6 +2,7 @@ package com.heyimamethyst.fairyfactions.common.entities.ai;
 
 import com.heyimamethyst.fairyfactions.FairyFactions;
 import com.heyimamethyst.fairyfactions.common.entities.FairyEntity;
+import com.heyimamethyst.fairyfactions.core.proxy.CommonMethods;
 import net.minecraft.world.entity.FlyingMob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
@@ -57,7 +58,7 @@ public class FairyAttackGoal extends MeleeAttackGoal
             {
                 // Scout's Totally Leet Air Attack.
 
-                FairyFactions.commonMethods.sendFairyMount(theFairy, entity);
+                CommonMethods.sendFairyMount(theFairy, entity);
 
                 entity.setJumping(true);
 
@@ -73,7 +74,7 @@ public class FairyAttackGoal extends MeleeAttackGoal
                 {
                     // The finish of its air attack.
 
-                    FairyFactions.commonMethods.sendFairyMount(theFairy, entity);
+                    CommonMethods.sendFairyMount(theFairy, entity);
 
                     theFairy.attackAnim = 35;
                 }

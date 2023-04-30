@@ -2,6 +2,7 @@ package com.heyimamethyst.fairyfactions.events.forge;
 
 import com.heyimamethyst.fairyfactions.FairyFactions;
 import com.heyimamethyst.fairyfactions.common.entities.FairyEntity;
+import com.heyimamethyst.fairyfactions.core.proxy.CommonMethods;
 import com.heyimamethyst.fairyfactions.util.EntityHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
@@ -64,7 +65,7 @@ public class ForgeClientEvents
 					if(key == 1 && action == 1 && !player.isShiftKeyDown())
 					{
 						FairyFactions.LOGGER.warn("Unmounting fairy "+fairy);
-						FairyFactions.commonMethods.sendFairyMount(fairy, player);
+						CommonMethods.sendFairyMount(fairy, player);
 					}
 				}
 			}

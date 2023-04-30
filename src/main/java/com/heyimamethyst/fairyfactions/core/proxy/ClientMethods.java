@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Player;
 
 public class ClientMethods
 {
-    public void openRenameGUI(FairyEntity fairy)
+    public static void openRenameGUI(FairyEntity fairy)
     {
         FairyFactions.LOGGER.info("ClientProxy.openRenameGUI");
 
@@ -20,7 +20,7 @@ public class ClientMethods
         }
     }
 
-    public Player getCurrentPlayer()
+    public static Player getCurrentPlayer()
     {
         return (Player)Minecraft.getInstance().player;
     }

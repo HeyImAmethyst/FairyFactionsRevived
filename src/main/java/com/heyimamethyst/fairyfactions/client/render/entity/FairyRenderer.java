@@ -4,6 +4,7 @@ import com.heyimamethyst.fairyfactions.FairyFactions;
 import com.heyimamethyst.fairyfactions.client.model.ModModelLayers;
 import com.heyimamethyst.fairyfactions.client.model.entity.FairyModel;
 import com.heyimamethyst.fairyfactions.common.entities.FairyEntity;
+import com.heyimamethyst.fairyfactions.core.proxy.ClientMethods;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import net.minecraft.client.Minecraft;
@@ -67,7 +68,7 @@ public class FairyRenderer extends MobRenderer<FairyEntity, FairyModel<FairyEnti
         }
         else if (pEntity.tamed())
         {
-            if (pEntity.isRuler(FairyFactions.clientMethods.getCurrentPlayer()))
+            if (pEntity.isRuler(ClientMethods.getCurrentPlayer()))
             {
                 return true;
             }
