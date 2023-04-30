@@ -3,12 +3,13 @@ package com.heyimamethyst.fairyfactions.core.proxy;
 import com.heyimamethyst.fairyfactions.FairyFactions;
 import com.heyimamethyst.fairyfactions.client.gui.GuiName;
 import com.heyimamethyst.fairyfactions.common.entities.FairyEntity;
+import com.heyimamethyst.fairyfactions.core.network.PacketSetFairyName;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
 public class ClientMethods
 {
-    public void openRenameGUI(FairyEntity fairy)
+    public static void openRenameGUI(FairyEntity fairy)
     {
         FairyFactions.LOGGER.info("ClientProxy.openRenameGUI");
 
@@ -20,7 +21,7 @@ public class ClientMethods
         }
     }
 
-    public Player getCurrentPlayer()
+    public static Player getCurrentPlayer()
     {
         return (Player)Minecraft.getInstance().player;
     }

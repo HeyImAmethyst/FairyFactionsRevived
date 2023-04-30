@@ -15,23 +15,23 @@ import java.util.List;
 public class CommonMethods
 {
 
-    public void sendChat(ServerPlayer player, Component component )
+    public static void sendChat(ServerPlayer player, Component component )
     {
         if ( player != null && component != null && !component.getString().isEmpty() )
             player.displayClientMessage(component, false);
     }
 
-    public <MSG> void sendToServer(MSG message)
+    public static <MSG> void sendToServer(MSG message)
     {
         ModNetwork.INSTANCE.sendToServer(message);
     }
 
-    public <MSG> void sendToPlayer(MSG message, ServerPlayer serverPlayer)
+    public static <MSG> void sendToPlayer(MSG message, ServerPlayer serverPlayer)
     {
         ModNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), message);
     }
 
-    public <MSG> void sendToAllPlayers(MSG message)
+    public static <MSG> void sendToAllPlayers(MSG message)
     {
         List<ServerPlayer> players = Minecraft.getInstance().player.getServer().getPlayerList().getPlayers();
 
@@ -41,14 +41,14 @@ public class CommonMethods
         }
     }
 
-    public void sendFairyRename(final FairyEntity fairy, final String name)
+    public static void sendFairyRename(final FairyEntity fairy, final String name)
     {
         final PacketSetFairyName packet = new PacketSetFairyName( fairy, name );
         sendToServer( packet );
     }
 
     // Packet that handles fairy mounting.
-    public void sendFairyMount(final Entity rider, final Entity vehicle)
+    public static void sendFairyMount(final Entity rider, final Entity vehicle)
     {
         final Entity newVehicle;
 

@@ -4,6 +4,8 @@ import com.heyimamethyst.fairyfactions.FairyConfig;
 import com.heyimamethyst.fairyfactions.FairyFactions;
 import com.heyimamethyst.fairyfactions.Loc;
 import com.heyimamethyst.fairyfactions.common.world.FairyGroupGenerator;
+import com.heyimamethyst.fairyfactions.core.proxy.ClientMethods;
+import com.heyimamethyst.fairyfactions.core.proxy.CommonMethods;
 import com.heyimamethyst.fairyfactions.util.FairyUtils;
 import com.heyimamethyst.fairyfactions.common.entities.ai.*;
 import com.heyimamethyst.fairyfactions.core.registry.ModSounds;
@@ -678,7 +680,7 @@ public class FairyEntity extends FairyEntityBase
         {
             this.discard();
         }
-        else if (!this.isPersistenceRequired() && !this.requiresCustomPersistence() && !isRuler(Minecraft.getInstance().player) && !tamed())
+        else if (!this.isPersistenceRequired() && !this.requiresCustomPersistence() && !tamed())
         {
             Player player = level.getNearestPlayer(this, -1D);
             net.minecraftforge.eventbus.api.Event.Result result = net.minecraftforge.event.ForgeEventFactory.canEntityDespawn(this);
@@ -1274,7 +1276,7 @@ public class FairyEntity extends FairyEntityBase
                 q = Loc.QUEEN.get();
             }
 
-            if (isRuler(FairyFactions.clientMethods.getCurrentPlayer()))
+            if (level.isClientSide() && isRuler(ClientMethods.getCurrentPlayer()))
             {
                 name = Component.literal(( posted() ? "§a" : "§c") + "@§f").append(Component.translatable(q)).append(woosh).append(( posted() ? "§a" : "§c") + "@");
             }
@@ -1750,7 +1752,7 @@ public class FairyEntity extends FairyEntityBase
                             if (!rulerName().equals(""))
                             {
                                 FairyFactions.LOGGER.info("FairyEntity.tick: calling proxy.openRenameGUI");
-                                FairyFactions.clientMethods.openRenameGUI(this);
+                                ClientMethods.openRenameGUI(this);
                             }
                             else
                             {
@@ -1806,7 +1808,7 @@ public class FairyEntity extends FairyEntityBase
                     {
                         // otherwise, right-clicking wears a fairy hat
 
-                        FairyFactions.commonMethods.sendFairyMount(this, player);
+                        CommonMethods.sendFairyMount(this, player);
 
                         setFlymode(true);
                         flyTime = 200;
@@ -1941,7 +1943,7 @@ public class FairyEntity extends FairyEntityBase
 
                 if (ruler instanceof ServerPlayer)
                 {
-                    FairyFactions.commonMethods.sendChat((ServerPlayer) ruler, Component.translatable(finalQueenString).append(name).append(Component.translatable(finalS)));
+                    CommonMethods.sendChat((ServerPlayer) ruler, Component.translatable(finalQueenString).append(name).append(Component.translatable(finalS)));
                 }
             }
         }
@@ -2032,7 +2034,7 @@ public class FairyEntity extends FairyEntityBase
             String finalS = s;
             String finalMessage = message;
 
-            FairyFactions.commonMethods.sendChat((ServerPlayer) ruler, Component.translatable(finalS).append(n).append(Component.translatable(finalMessage)));
+            CommonMethods.sendChat((ServerPlayer) ruler, Component.translatable(finalS).append(n).append(Component.translatable(finalMessage)));
         }
 
         FairyFactions.LOGGER.info("tameMe: " + rulerName() + ": " + this);
@@ -2054,7 +2056,7 @@ public class FairyEntity extends FairyEntityBase
                 {
                     if (fairy.getVehicle() != null)
                     {
-                        FairyFactions.commonMethods.sendFairyMount(fairy, fairy.getVehicle());
+                        CommonMethods.sendFairyMount(fairy, fairy.getVehicle());
                     }
 
                     fairy.setTarget(null);
@@ -2151,7 +2153,7 @@ public class FairyEntity extends FairyEntityBase
             String finalS = s;
             String finalS1 = s2;
 
-            FairyFactions.commonMethods.sendChat((ServerPlayer) ruler, Component.translatable(finalS).append(n).append(Component.translatable(finalS1)));
+            CommonMethods.sendChat((ServerPlayer) ruler, Component.translatable(finalS).append(n).append(Component.translatable(finalS1)));
         }
     }
 
@@ -2334,14 +2336,14 @@ public class FairyEntity extends FairyEntityBase
 
             if (getVehicle() != null && getRandom().nextInt(2) == 0)
             {
-                FairyFactions.commonMethods.sendFairyMount(this, getVehicle());
+                CommonMethods.sendFairyMount(this, getVehicle());
             }
         }
         else if (flag)
         {
             if (getVehicle() != null)
             {
-                FairyFactions.commonMethods.sendFairyMount(this, getVehicle());
+                CommonMethods.sendFairyMount(this, getVehicle());
             }
 
             if (queen() && !tamed())
@@ -2505,7 +2507,7 @@ public class FairyEntity extends FairyEntityBase
         if (player instanceof ServerPlayer)
         {
             String finalS = s2;
-            FairyFactions.commonMethods.sendChat((ServerPlayer) player, Component.translatable(s).append(Component.translatable(finalS)));
+            CommonMethods.sendChat((ServerPlayer) player, Component.translatable(s).append(Component.translatable(finalS)));
 
         }
     }
@@ -2605,7 +2607,7 @@ public class FairyEntity extends FairyEntityBase
     {
         if(FairyEntity.checkFairySpawnRules((EntityType<? extends FairyEntity>) this.getType(), pLevel, mobSpawnType, this.blockPosition(), this.random))
         {
-            if(ruler == null && !isRuler(Minecraft.getInstance().player) && getFaction() == 0)
+            if(ruler == null && /*!isRuler(Minecraft.getInstance().player) */ !tamed() && getFaction() == 0)
             {
                 boolean doCreateGroup = false; //= fairy.getRandom().nextInt(2) != 0;
 

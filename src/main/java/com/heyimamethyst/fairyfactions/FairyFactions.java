@@ -32,8 +32,8 @@ public class FairyFactions
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static CommonMethods commonMethods = new CommonMethods();
-    public static ClientMethods clientMethods = new ClientMethods();
+    //public static CommonMethods commonMethods = new CommonMethods();
+    //public static ClientMethods clientMethods = new ClientMethods();
 
     public FairyFactions()
     {

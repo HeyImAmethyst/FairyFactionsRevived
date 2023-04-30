@@ -2,6 +2,7 @@ package com.heyimamethyst.fairyfactions.events.forge;
 
 import com.heyimamethyst.fairyfactions.FairyFactions;
 import com.heyimamethyst.fairyfactions.common.entities.FairyEntity;
+import com.heyimamethyst.fairyfactions.core.proxy.ClientMethods;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -35,7 +36,7 @@ public class ForgeEvents
 			else if (fairy.tamed())
 			{
 
-				if (fairy.isRuler(FairyFactions.clientMethods.getCurrentPlayer()))
+				if (fairy.isRuler(ClientMethods.getCurrentPlayer()))
 				{
 					event.setResult(Event.Result.ALLOW);
 				}

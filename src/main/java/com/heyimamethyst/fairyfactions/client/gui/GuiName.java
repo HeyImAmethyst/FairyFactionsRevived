@@ -2,12 +2,15 @@ package com.heyimamethyst.fairyfactions.client.gui;
 
 import com.heyimamethyst.fairyfactions.FairyFactions;
 import com.heyimamethyst.fairyfactions.common.entities.FairyEntity;
+import com.heyimamethyst.fairyfactions.core.proxy.CommonMethods;
 import com.heyimamethyst.fairyfactions.util.FairyUtils;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.widget.ExtendedButton;
 
 public class GuiName extends Screen
@@ -65,7 +68,7 @@ public class GuiName extends Screen
 
             if (fairy.level.isClientSide)
             {
-                FairyFactions.commonMethods.sendFairyRename(fairy, nameText);
+                CommonMethods.sendFairyRename(fairy, nameText);
             }
             else
             {
