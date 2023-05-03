@@ -2,6 +2,7 @@ package com.heyimamethyst.fairyfactions.core.registry;
 
 import com.heyimamethyst.fairyfactions.FairyFactions;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -14,12 +15,12 @@ public class ModItemTags
 
 	private static TagKey<Item> bind(String p_203855_)
 	{
-		return TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(p_203855_));
+		return TagKey.create(Registries.ITEM, new ResourceLocation(p_203855_));
 	}
 
 	public static TagKey<Item> create(final ResourceLocation name)
 	{
-		return TagKey.create(Registry.ITEM_REGISTRY, name);
+		return TagKey.create(Registries.ITEM, name);
 	}
 
 	private static TagKey<Item> makeTag(String name)

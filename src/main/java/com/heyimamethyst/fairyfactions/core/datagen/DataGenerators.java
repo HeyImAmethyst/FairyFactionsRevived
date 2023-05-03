@@ -6,11 +6,13 @@ import com.google.gson.JsonElement;
 import com.heyimamethyst.fairyfactions.FairyFactions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -24,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 
 @Mod.EventBusSubscriber(modid = FairyFactions.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DataGenerators
@@ -36,16 +39,20 @@ public class DataGenerators
 			DataGenerator generator = event.getGenerator();
 			
 			ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
-			
-			Path outputFolder = generator.getOutputFolder();
-			RegistryAccess registries = RegistryAccess.builtinCopy();
-			RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, registries);
+
+			PackOutput packOutput = generator.getPackOutput();
+			Path outputFolder = packOutput.getOutputFolder();
+
+			//RegistryAccess registries = RegistryAccess.builtinCopy();
+			//RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, registries);
 			Gson gson = new GsonBuilder()
 				.setPrettyPrinting()
 				.create();
 
-			generator.addProvider(true, new ModItemModelProvider(generator, existingFileHelper));
-			generator.addProvider(true, new ModWorldGenProvider(generator, existingFileHelper, ops));
+		CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
+
+		generator.addProvider(true, new ModItemModelProvider(packOutput, existingFileHelper));
+		//generator.addProvider(true, new ModWorldGenProvider(generator, existingFileHelper, ops));
 	}
 	
 //	/* Helper method that serializes many objects of the same registry type for us (note the vararg)*/

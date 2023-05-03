@@ -17,28 +17,28 @@ import net.minecraftforge.registries.holdersets.AndHolderSet;
 
 import java.util.Arrays;
 
-public class ModWorldGenProvider extends WorldgenProvider
+public class ModWorldGenProvider //extends WorldgenProvider
 {
-    ModWorldGenProvider(DataGenerator generator, ExistingFileHelper existingFileHelper, RegistryOps<JsonElement> ops)
-    {
-        super(generator, existingFileHelper, ops, FairyFactions.MOD_ID);
-    }
-
-    @Override
-    protected void generateConfiguredFeatures()
-    {
-
-    }
-
-    @Override
-    protected void generatePlacedFeatures()
-    {
-
-    }
-
-    @Override
-    protected void generateBiomeModifiers()
-    {
-        biomeModifier("fairy_spawns", ForgeBiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(getBiomeTag(ModBiomeTags.IS_FAIRY_BIOME), new MobSpawnSettings.SpawnerData(ModEntities.FAIRY_ENTITY.get(), 40, 1, 4)));
-    }
+//    ModWorldGenProvider(DataGenerator generator, ExistingFileHelper existingFileHelper, RegistryOps<JsonElement> ops)
+//    {
+//        super(generator, existingFileHelper, ops, FairyFactions.MOD_ID);
+//    }
+//
+//    @Override
+//    protected void generateConfiguredFeatures()
+//    {
+//
+//    }
+//
+//    @Override
+//    protected void generatePlacedFeatures()
+//    {
+//
+//    }
+//
+//    @Override
+//    protected void generateBiomeModifiers()
+//    {
+//        biomeModifier("fairy_spawns", ForgeBiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(getBiomeTag(ModBiomeTags.IS_FAIRY_BIOME), new MobSpawnSettings.SpawnerData(ModEntities.FAIRY_ENTITY.get(), 40, 1, 4)));
+//    }
 }

@@ -10,11 +10,15 @@ import com.heyimamethyst.fairyfactions.client.render.entity.FairyFishHookEntityR
 import com.heyimamethyst.fairyfactions.client.render.entity.FairyRenderer;
 import com.heyimamethyst.fairyfactions.common.items.ModSpawnEggItem;
 import com.heyimamethyst.fairyfactions.core.registry.ModEntities;
+import com.heyimamethyst.fairyfactions.core.registry.ModItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -36,7 +40,16 @@ public class ModClientEvents
 		EntityRenderDispatcher manager = mc.getEntityRenderDispatcher();
 		//ModKeyBinds.register(event);
 	}
-	
+
+	@SubscribeEvent
+	public static void addCreative(CreativeModeTabEvent.BuildContents event)
+	{
+		if(event.getTab() == CreativeModeTabs.SPAWN_EGGS)
+		{
+			event.accept(ModItems.FAIRY_SPAWN_EGG);
+		}
+	}
+
 	@SubscribeEvent
 	public static void RegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event)
 	{
